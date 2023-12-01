@@ -1,2 +1,4 @@
 # playground
-A "playground" for learning and experimenting languages and projects
+
+A repository for personal projects. From fully fledged cloud continuous deployed projects to experimental stacks and competitive programming-style exercises.
+
