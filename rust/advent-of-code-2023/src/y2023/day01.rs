@@ -112,7 +112,7 @@ fn parse_word_numbers(input: &str) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::y2023::day1::{parse_calibration, parse_word_numbers};
+    use crate::y2023::day01::{parse_calibration, parse_word_numbers};
 
     #[test]
     fn sample1() {

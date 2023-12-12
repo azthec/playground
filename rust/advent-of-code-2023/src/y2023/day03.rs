@@ -210,8 +210,6 @@ mod tests {
         let current = "..395...".to_string();
         let next = "......#.".to_string();
 
-        // let current: String = "..234..".to_string();
-        // let next: String = "......#".to_string();
         assert!(!is_part_number(None, &current, Some(&next), 2, 4));
     }
 
@@ -306,15 +304,5 @@ mod tests {
     #[test]
     fn contains_symbol3() {
         assert!(!contains_symbol(Some("0123!5"), Some((0, 3))))
-    }
-
-    #[test]
-    fn part1_example() {
-        assert_eq!(part1(&vec![]), 2);
-    }
-
-    #[test]
-    fn part2_example() {
-        assert_eq!(part2(&vec![]), "");
     }
 }
