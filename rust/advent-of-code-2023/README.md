@@ -29,3 +29,11 @@ Found 3 outliers among 100 measurements (3.00%)
 Day11 - Part1/(default) time:   [138.21 ms 138.52 ms 138.85 ms]
 Day11 - Part2/(default) time:   [137.47 ms 137.74 ms 138.04 ms]
 ```
+
+## Day 12
+
+```
+Day12 - Part1/(default) time:   [11.800 ms 11.856 ms 11.913 ms]
+Day12 - Part2/(default) time:   [571.66 ms 574.19 ms 576.83 ms]
+```
+
