@@ -4,12 +4,14 @@ use crossterm::{
   execute,
   terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
+use ratatui::{prelude::*, widgets::*};
 use ratatui::{
-  prelude::{CrosstermBackend, Frame, Terminal},
+  prelude::{Alignment, Constraint, CrosstermBackend, Frame, Layout, Terminal},
   style::Stylize,
-  widgets::Paragraph,
+  widgets::{block, Block, Borders, Clear, Paragraph},
 };
-use std::io::{stderr, stdout};
+use std::io::stderr;
+use tictactoe::widgets::Board;
 
 struct State {
   counter: i64,
@@ -29,12 +31,30 @@ fn shutdown() -> Result<()> {
 }
 
 fn draw(state: &State, frame: &mut Frame) {
+  let [left, right] = Layout::horizontal([Constraint::Percentage(65), Constraint::Percentage(45)])
+    .margin(2)
+    .areas(frame.size());
+  let game_block = Block::default()
+    .title(block::Title::from("Tictactoe").alignment(Alignment::Left))
+    .borders(Borders::ALL)
+    .light_yellow();
+  let help_block = Block::default()
+    .title(block::Title::from("Help").alignment(Alignment::Left))
+    .borders(Borders::ALL)
+    .light_yellow();
+  frame.render_widget(Clear, frame.size());
+  frame.render_widget(game_block, left);
+  frame.render_widget(help_block, right);
+
+  let [game_area, _] = Layout::vertical([Constraint::Percentage(100), Constraint::Min(20)])
+    .margin(1)
+    .areas(left);
   frame.render_widget(
-    Paragraph::new(format!("Counter: {0}", state.counter))
-      .white()
-      .on_blue(),
-    frame.size(),
-  )
+    Board {
+      content: "eeeeee".to_string(),
+    },
+    game_area,
+  );
 }
 
 fn update(state: &mut State) -> Result<()> {
