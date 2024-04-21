@@ -1,25 +1,21 @@
 package com.github.azthec;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestResponse;
+
+import io.smallrye.mutiny.Uni;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
-
-import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.resteasy.reactive.RestPath;
-import org.jboss.resteasy.reactive.RestResponse;
-import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
-
-import io.quarkus.security.UnauthorizedException;
-import io.smallrye.mutiny.Uni;
 
 /*
  * This dummy path tests role based authentication, with the extra validation
@@ -82,25 +78,5 @@ public class TokenSecuredResource {
 
   private boolean hasJwt() {
     return jwt.getClaimNames() != null;
-  }
-
-  @ServerExceptionMapper
-  public RestResponse<String> mapException(Throwable ex) {
-    var status = (RestResponse.Status) null;
-
-    if (ex instanceof NotFoundException) {
-      status = RestResponse.Status.NOT_FOUND;
-
-    } else if (ex instanceof IllegalArgumentException) {
-      status = RestResponse.Status.BAD_REQUEST;
-
-    } else if (ex instanceof UnauthorizedException) {
-      status = RestResponse.Status.UNAUTHORIZED;
-
-    } else {
-      status = RestResponse.Status.INTERNAL_SERVER_ERROR;
-    }
-
-    return RestResponse.status(status, ex.getMessage());
   }
 }
