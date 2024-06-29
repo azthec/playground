@@ -1,5 +1,9 @@
+**/.dev/*
+**/.env/*
+
 **/debug/*
 **/target/*
 
 **/*.rs.bk
 
+**/__pycache__/*
