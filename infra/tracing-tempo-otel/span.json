@@ -1,0 +1,48 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "test-with-curl-parent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "manual-test",
+            "version": "0.0.1",
+            "attributes": [
+              {
+                "key": "manual-scope-attribute",
+                "value": {
+                  "stringValue": "some scope attribute"
+                }
+              }
+            ]
+          },
+          "spans": [
+            {
+              "traceId": "71699baabbbb82c7c8995ea3d9c95df3",
+              "spanId": "aaaaaaaaaa8be065",
+              "name": "spanitron",
+              "startTimeUnixNano": "1720166699000000000",
+              "endTimeUnixNano": "1720188299000000000",
+              "kind": 2,
+              "droppedAttributesCount": 0,
+              "events": [],
+              "droppedEventsCount": 0,
+              "status": {
+                "code": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
