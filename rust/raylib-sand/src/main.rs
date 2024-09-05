@@ -4,7 +4,6 @@ pub mod grid;
 
 use crate::game::*;
 use colorscheme::*;
-use rand::prelude::*;
 use raylib::prelude::*;
 
 struct Settings {
@@ -15,9 +14,9 @@ struct Settings {
 
 fn main() {
     let settings = Settings {
-        screen_width: 1280,
-        screen_height: 720,
-        pixel_size: 8,
+        screen_width: 1920,
+        screen_height: 1080,
+        pixel_size: 10,
     };
 
     let (mut rl, thread) = raylib::init()
@@ -27,14 +26,13 @@ fn main() {
         )
         .title("raylib-sand")
         .build();
-    rl.set_target_fps(60);
+    rl.set_target_fps(120);
 
     let mut game = Game::init(&settings);
 
     while !rl.window_should_close() {
-        // TODO refactor this interact logic
         let mut clicked: Option<(usize, usize)> = None;
-        if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
+        if rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT) {
             let mouse_position = rl.get_mouse_position();
             clicked = Some((
                 mouse_position.x as usize / settings.pixel_size,

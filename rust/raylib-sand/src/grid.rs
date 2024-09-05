@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use crate::*;
 
-// consider defining a copy on write matrix and using that
+// #eval defining a copy on write matrix and using that
 type Matrix<'a, T> = Vec<Vec<Cow<'a, T>>>;
 
 #[derive(Clone, Copy)]
@@ -19,7 +19,7 @@ impl Cell {
     }
 }
 
-// consider implementing a sparse grid
+// #eval implementing a sparse grid
 #[derive(Clone)]
 pub struct Grid {
     cells: Vec<Vec<Cell>>,
@@ -29,7 +29,7 @@ pub struct Grid {
 }
 
 impl Grid {
-    // consider keeping a reference to a single empty cell object
+    // #eval keeping a reference to a single empty cell object
     pub fn new(width: usize, height: usize, cell_size: usize) -> Self {
         Self {
             cells: vec![vec![Cell::empty(); height]; width],
@@ -40,13 +40,26 @@ impl Grid {
     }
     pub fn update(&mut self, rl: &RaylibHandle, clicked: Option<(usize, usize)>) -> &mut Grid {
         if let Some((x, y)) = clicked {
-            self.cells[x][y].color += 5;
+            if x < self.width && y < self.width {
+                if let Some(row) = self.cells.get_mut(x) {
+                    if let Some(cell) = row.get_mut(y) {
+                        cell.color = cell.color.checked_add(5).unwrap_or(1);
+                    }
+                }
+            }
         }
-        for col in (0..self.height - 1).rev() {
-            for row in 0..self.width - 2 {
-                if !self.cells[row][col].is_empty() {
-                    if (self.cells[row][col + 1].is_empty()) {
+
+        for col in (0..self.height).rev() {
+            for row in 0..self.width {
+                if !self.cells[row][col].is_empty() && col < self.height - 1 {
+                    if self.cells[row][col + 1].is_empty() {
                         self.cells[row][col + 1] = self.cells[row][col];
+                        self.cells[row][col] = Cell::empty();
+                    } else if row > 0 && self.cells[row - 1][col + 1].is_empty() {
+                        self.cells[row - 1][col + 1] = self.cells[row][col];
+                        self.cells[row][col] = Cell::empty();
+                    } else if row < self.width - 1 && self.cells[row + 1][col + 1].is_empty() {
+                        self.cells[row + 1][col + 1] = self.cells[row][col];
                         self.cells[row][col] = Cell::empty();
                     }
                 }

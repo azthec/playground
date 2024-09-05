@@ -11,7 +11,6 @@ pub const DARK_BROWN: Color = Color::new(58, 40, 2, 255);
 pub const SLATE_GREEN: Color = Color::new(32, 34, 21, 255);
 
 // ayy4
-
 pub const DEEP_SEA_BLUE: Color = Color::new(0, 48, 59, 255);
 pub const SOFT_CORAL: Color = Color::new(255, 119, 119, 255);
 pub const PEACH: Color = Color::new(255, 206, 150, 255);
