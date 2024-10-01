@@ -7,12 +7,12 @@ use bevy::prelude::Component;
 
 #[derive(Component, Copy, Clone)]
 pub struct Position {
-    pub x: f32,
-    pub y: f32,
+    pub x: i32,
+    pub y: i32,
 }
 
 impl Position {
-    fn distance(&self, other: &Position) -> f32 {
+    fn distance(&self, other: &Position) -> i32 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
     }
 }
@@ -39,16 +39,15 @@ impl Sub for Position {
     }
 }
 
-// note that it compares floored floats
 impl Hash for Position {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        (self.x.floor().to_bits(), self.y.floor().to_bits()).hash(state);
+        (self.x, self.y).hash(state);
     }
 }
 
 impl PartialEq for Position {
     fn eq(&self, other: &Self) -> bool {
-        (self.x - other.x).abs() < f32::EPSILON && (self.y - other.y).abs() < f32::EPSILON
+        (self.x - other.x).abs() == 0 && (self.y - other.y).abs() == 0
     }
 }
 

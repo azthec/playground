@@ -1,18 +1,19 @@
 use crate::{colorscheme::FLAME_ORANGE, default};
 use bevy::{
     math::Vec2,
-    prelude::Bundle,
+    prelude::{Bundle, Component},
     sprite::{Sprite, SpriteBundle},
     transform::components::Transform,
 };
-
-use crate::components::collider::Collider;
 
 const WALL_THICKNESS: f32 = 10.0;
 const LEFT_WALL: f32 = -450.;
 const RIGHT_WALL: f32 = 450.;
 const BOTTOM_WALL: f32 = -300.;
 const TOP_WALL: f32 = 300.;
+
+#[derive(Component)]
+struct Collider;
 
 #[derive(Bundle)]
 pub struct WallBundle {
