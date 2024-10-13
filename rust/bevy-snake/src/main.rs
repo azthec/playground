@@ -1,8 +1,11 @@
 mod colorscheme;
 
+use rand::seq::SliceRandom;
+use std::collections::HashSet;
+
 use bevy::{prelude::*, window::WindowResolution};
 use bevy_framepace::Limiter;
-use rand::random;
+use rand::{random, thread_rng};
 
 const COLOR_BACKGROUND: Color = Color::Srgba(colorscheme::DEEP_SEA_BLUE);
 const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::PEACH);
@@ -20,8 +23,10 @@ const COLOR_FOOD: Color = Color::Srgba(colorscheme::CHESTNUT_RED);
 // const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / gdc_resolution).floor() as i32;
 // const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / gdc_resolution).floor() as i32;
 
-pub const RESOLUTION_WIDTH: f32 = 1920.;
-pub const RESOLUTION_HEIGHT: f32 = 1080.;
+pub const RESOLUTION_WIDTH: f32 = 2880.;
+pub const RESOLUTION_HEIGHT: f32 = 1800.;
+// pub const RESOLUTION_WIDTH: f32 = 1920.;
+// pub const RESOLUTION_HEIGHT: f32 = 1080.;
 pub const RESOLUTION_GCD: i32 = 120;
 
 // const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / RESOLUTION_GCD).floor() as i32;
@@ -191,23 +196,56 @@ fn position_translation(mut q: Query<(&Position, &mut Transform)>) {
     }
 }
 
-fn food_spawner(mut commands: Commands, food_query: Query<&Food>) {
+fn food_spawner(
+    food_query: Query<&Food>,
+    segments: ResMut<TailSegments>,
+    mut commands: Commands,
+    heads: Query<&Position, With<Head>>,
+    positions: Query<&Position, With<Tail>>,
+) {
     let food_count = food_query.into_iter().count();
     if food_count < 5 {
-        commands
-            .spawn(SpriteBundle {
-                sprite: Sprite {
-                    color: COLOR_FOOD,
-                    ..default()
-                },
-                ..default()
-            })
-            .insert(Food)
-            .insert(Position {
-                x: (random::<f32>() * GRID_WIDTH as f32) as i32,
-                y: (random::<f32>() * GRID_HEIGHT as f32) as i32,
-            })
-            .insert(Size::square(0.8));
+        if let Some(head_position) = heads.iter().next() {
+            let all_pos: HashSet<(i32, i32)> = (0..GRID_HEIGHT)
+                .flat_map(|y| (0..GRID_WIDTH).map(move |x| (x, y)))
+                .collect();
+            let head_pos: HashSet<(i32, i32)> = HashSet::from([(head_position.x, head_position.y)]);
+            let tail_pos: HashSet<(i32, i32)> = segments
+                .0
+                .iter()
+                .map(|e| *positions.get(*e).unwrap())
+                .collect::<Vec<Position>>()
+                .iter()
+                .map(|pos| (pos.x, pos.y))
+                .collect();
+            let valid_pos: Vec<(i32, i32)> = all_pos
+                .difference(&head_pos)
+                .cloned()
+                .collect::<HashSet<(i32, i32)>>()
+                .difference(&tail_pos)
+                .cloned()
+                .collect();
+            dbg!(&valid_pos);
+
+            for random_position in
+                valid_pos.choose_multiple(&mut rand::thread_rng(), 5 - food_count)
+            {
+                commands
+                    .spawn(SpriteBundle {
+                        sprite: Sprite {
+                            color: COLOR_FOOD,
+                            ..default()
+                        },
+                        ..default()
+                    })
+                    .insert(Food)
+                    .insert(Position {
+                        x: random_position.0,
+                        y: random_position.1,
+                    })
+                    .insert(Size::square(0.5));
+            }
+        }
     }
 }
 
