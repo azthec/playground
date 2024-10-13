@@ -9,11 +9,26 @@ const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::PEACH);
 const COLOR_SNAKE_TAIL: Color = Color::Srgba(colorscheme::PALE_LIME);
 const COLOR_FOOD: Color = Color::Srgba(colorscheme::CHESTNUT_RED);
 
-pub const RESOLUTION_WIDTH: f32 = 2880.;
-pub const RESOLUTION_HEIGHT: f32 = 1800.;
+// fn gcd(mut a: f32, mut b: f32) -> f32 {
+//     while b != 0. {
+//         let t = b;
+//         b = a % b;
+//         a = t;
+//     }
+//     a
+// }
+// const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / gdc_resolution).floor() as i32;
+// const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / gdc_resolution).floor() as i32;
 
-const GRID_WIDTH: i32 = 20;
-const GRID_HEIGHT: i32 = 20;
+
+pub const RESOLUTION_WIDTH: f32 = 1920.;
+pub const RESOLUTION_HEIGHT: f32 = 1080.;
+pub const RESOLUTION_GCD: i32 = 120;
+
+// const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / RESOLUTION_GCD).floor() as i32;
+// const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / RESOLUTION_GCD).floor() as i32;
+const GRID_WIDTH: i32 = 16;
+const GRID_HEIGHT: i32 = 9;
 const GRID_SIZE: i32 = 20;
 
 #[derive(Component)]
@@ -175,7 +190,7 @@ fn position_translation(mut q: Query<(&Position, &mut Transform)>) {
     for (pos, mut transform) in q.iter_mut() {
         transform.translation = Vec3::new(
             convert(pos.x as f32, RESOLUTION_WIDTH, GRID_WIDTH as f32),
-            convert(pos.y as f32, RESOLUTION_HEIGHT, GRID_SIZE as f32),
+            convert(pos.y as f32, RESOLUTION_HEIGHT, GRID_HEIGHT as f32),
             0.0,
         );
     }
