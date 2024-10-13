@@ -20,7 +20,6 @@ const COLOR_FOOD: Color = Color::Srgba(colorscheme::CHESTNUT_RED);
 // const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / gdc_resolution).floor() as i32;
 // const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / gdc_resolution).floor() as i32;
 
-
 pub const RESOLUTION_WIDTH: f32 = 1920.;
 pub const RESOLUTION_HEIGHT: f32 = 1080.;
 pub const RESOLUTION_GCD: i32 = 120;
@@ -29,11 +28,11 @@ pub const RESOLUTION_GCD: i32 = 120;
 // const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / RESOLUTION_GCD).floor() as i32;
 const GRID_WIDTH: i32 = 16;
 const GRID_HEIGHT: i32 = 9;
-const GRID_SIZE: i32 = 20;
 
 #[derive(Component)]
 struct Head {
     direction: Direction,
+    next_direction: Option<Direction>,
 }
 
 #[derive(Component)]
@@ -144,6 +143,7 @@ fn spawn_snake(mut commands: Commands, mut segments: ResMut<TailSegments>) {
             })
             .insert(Head {
                 direction: Direction::Up,
+                next_direction: None,
             })
             .insert(Tail)
             .insert(Position { x: 3, y: 3 })
@@ -155,20 +155,15 @@ fn spawn_snake(mut commands: Commands, mut segments: ResMut<TailSegments>) {
 
 fn input_handler(input: Res<ButtonInput<KeyCode>>, mut heads: Query<&mut Head, With<Head>>) {
     if let Some(mut head) = heads.iter_mut().next() {
-        let dir: Direction = if input.pressed(KeyCode::ArrowLeft) {
-            Direction::Left
+        if input.pressed(KeyCode::ArrowLeft) {
+            head.next_direction = Some(Direction::Left);
         } else if input.pressed(KeyCode::ArrowDown) {
-            Direction::Down
+            head.next_direction = Some(Direction::Down);
         } else if input.pressed(KeyCode::ArrowUp) {
-            Direction::Up
+            head.next_direction = Some(Direction::Up);
         } else if input.pressed(KeyCode::ArrowRight) {
-            Direction::Right
-        } else {
-            head.direction
+            head.next_direction = Some(Direction::Right);
         };
-        if dir != head.direction.opposite() {
-            head.direction = dir;
-        }
     }
 }
 
@@ -196,7 +191,7 @@ fn position_translation(mut q: Query<(&Position, &mut Transform)>) {
     }
 }
 
-fn food_spawner(mut commands: Commands, food_query: Query<(&Food)>) {
+fn food_spawner(mut commands: Commands, food_query: Query<&Food>) {
     let food_count = food_query.into_iter().count();
     if food_count < 5 {
         commands
@@ -218,18 +213,29 @@ fn food_spawner(mut commands: Commands, food_query: Query<(&Food)>) {
 
 fn snake_movement(
     segments: ResMut<TailSegments>,
-    mut heads: Query<(Entity, &Head)>,
+    mut heads: Query<(Entity, &mut Head)>,
     mut positions: Query<&mut Position>,
     mut last_tail_position: ResMut<LastTailPosition>,
     mut game_over_writer: EventWriter<GameOverEvent>,
 ) {
-    if let Some((head_entity, head)) = heads.iter_mut().next() {
+    if let Some((head_entity, mut head)) = heads.iter_mut().next() {
         let segment_positions = segments
             .0
             .iter()
             .map(|e| *positions.get_mut(*e).unwrap())
             .collect::<Vec<Position>>();
         let mut head_pos = positions.get_mut(head_entity).unwrap();
+        match head.next_direction {
+            Some(new_direction) => {
+                if new_direction == head.direction.opposite() {
+                    head.next_direction = None;
+                } else {
+                    head.direction = new_direction;
+                    head.next_direction = None;
+                }
+            }
+            None => {}
+        }
         match &head.direction {
             Direction::Left => {
                 head_pos.x -= 1;
