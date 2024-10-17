@@ -5,12 +5,11 @@ use std::collections::HashSet;
 
 use bevy::{prelude::*, window::WindowResolution};
 use bevy_framepace::Limiter;
-use rand::{random, thread_rng};
 
-const COLOR_BACKGROUND: Color = Color::Srgba(colorscheme::DEEP_SEA_BLUE);
-const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::PEACH);
-const COLOR_SNAKE_TAIL: Color = Color::Srgba(colorscheme::PALE_LIME);
-const COLOR_FOOD: Color = Color::Srgba(colorscheme::CHESTNUT_RED);
+const COLOR_BACKGROUND: Color = Color::Srgba(colorscheme::BASE);
+const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::SAPPHIRE);
+const COLOR_SNAKE_TAIL: Color = Color::Srgba(colorscheme::SKY);
+const COLOR_FOOD: Color = Color::Srgba(colorscheme::PEACH);
 
 // fn gcd(mut a: f32, mut b: f32) -> f32 {
 //     while b != 0. {
@@ -111,7 +110,7 @@ fn main() {
         }),))
         .add_plugins(bevy_framepace::FramepacePlugin)
         .insert_resource(ClearColor(COLOR_BACKGROUND))
-        .insert_resource(Time::<Fixed>::from_seconds(0.20))
+        .insert_resource(Time::<Fixed>::from_seconds(0.10))
         .insert_resource(TailSegments::default())
         .insert_resource(LastTailPosition::default())
         .add_event::<GrowthEvent>()
@@ -160,15 +159,35 @@ fn spawn_snake(mut commands: Commands, mut segments: ResMut<TailSegments>) {
 
 fn input_handler(input: Res<ButtonInput<KeyCode>>, mut heads: Query<&mut Head, With<Head>>) {
     if let Some(mut head) = heads.iter_mut().next() {
-        if input.pressed(KeyCode::ArrowLeft) {
-            head.next_direction = Some(Direction::Left);
-        } else if input.pressed(KeyCode::ArrowDown) {
-            head.next_direction = Some(Direction::Down);
-        } else if input.pressed(KeyCode::ArrowUp) {
-            head.next_direction = Some(Direction::Up);
-        } else if input.pressed(KeyCode::ArrowRight) {
-            head.next_direction = Some(Direction::Right);
+        let pressed_direction = if input.pressed(KeyCode::ArrowLeft)
+            || input.pressed(KeyCode::KeyA)
+            || input.pressed(KeyCode::KeyH)
+        {
+            Some(Direction::Left)
+        } else if input.pressed(KeyCode::ArrowDown)
+            || input.pressed(KeyCode::KeyS)
+            || input.pressed(KeyCode::KeyJ)
+        {
+            Some(Direction::Down)
+        } else if input.pressed(KeyCode::ArrowUp)
+            || input.pressed(KeyCode::KeyW)
+            || input.pressed(KeyCode::KeyK)
+        {
+            Some(Direction::Up)
+        } else if input.pressed(KeyCode::ArrowRight)
+            || input.pressed(KeyCode::KeyD)
+            || input.pressed(KeyCode::KeyL)
+        {
+            Some(Direction::Right)
+        } else {
+            None
         };
+
+        if let Some(direction) = pressed_direction {
+            if direction != head.direction.opposite() {
+                head.next_direction = Some(direction);
+            }
+        }
     }
 }
 
@@ -225,7 +244,6 @@ fn food_spawner(
                 .difference(&tail_pos)
                 .cloned()
                 .collect();
-            dbg!(&valid_pos);
 
             for random_position in
                 valid_pos.choose_multiple(&mut rand::thread_rng(), 5 - food_count)
@@ -263,17 +281,8 @@ fn snake_movement(
             .map(|e| *positions.get_mut(*e).unwrap())
             .collect::<Vec<Position>>();
         let mut head_pos = positions.get_mut(head_entity).unwrap();
-        match head.next_direction {
-            Some(new_direction) => {
-                if new_direction == head.direction.opposite() {
-                    head.next_direction = None;
-                } else {
-                    head.direction = new_direction;
-                    head.next_direction = None;
-                }
-            }
-            None => {}
-        }
+        head.direction = head.next_direction.unwrap_or(head.direction);
+        head.next_direction = None;
         match &head.direction {
             Direction::Left => {
                 head_pos.x -= 1;
