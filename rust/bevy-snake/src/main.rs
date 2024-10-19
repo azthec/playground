@@ -1,14 +1,18 @@
 mod colorscheme;
+mod debug;
+mod limited_queue;
 
+use crate::debug::*;
+use crate::limited_queue::LimitedQueue;
 use rand::seq::SliceRandom;
 use std::collections::HashSet;
 
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*, window::WindowResolution};
 use bevy_framepace::Limiter;
 
 const COLOR_BACKGROUND: Color = Color::Srgba(colorscheme::BASE);
-const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::SAPPHIRE);
-const COLOR_SNAKE_TAIL: Color = Color::Srgba(colorscheme::SKY);
+const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::TEXT);
+const COLOR_SNAKE_TAIL: Color = Color::Srgba(colorscheme::SUBTEXT0);
 const COLOR_FOOD: Color = Color::Srgba(colorscheme::PEACH);
 
 // fn gcd(mut a: f32, mut b: f32) -> f32 {
@@ -22,6 +26,7 @@ const COLOR_FOOD: Color = Color::Srgba(colorscheme::PEACH);
 // const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / gdc_resolution).floor() as i32;
 // const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / gdc_resolution).floor() as i32;
 
+// TODO use SystemParam for this
 pub const RESOLUTION_WIDTH: f32 = 2880.;
 pub const RESOLUTION_HEIGHT: f32 = 1800.;
 // pub const RESOLUTION_WIDTH: f32 = 1920.;
@@ -36,7 +41,6 @@ const GRID_HEIGHT: i32 = 9;
 #[derive(Component)]
 struct Head {
     direction: Direction,
-    next_direction: Option<Direction>,
 }
 
 #[derive(Component)]
@@ -44,6 +48,15 @@ struct Tail;
 
 #[derive(Resource, Default)]
 struct TailSegments(Vec<Entity>);
+
+#[derive(Resource)]
+struct InputBuffer(LimitedQueue<Direction>);
+
+impl Default for InputBuffer {
+    fn default() -> Self {
+        InputBuffer(LimitedQueue::new(3))
+    }
+}
 
 #[derive(Component)]
 struct Food;
@@ -68,7 +81,7 @@ impl Size {
     }
 }
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 enum Direction {
     Left,
     Up,
@@ -96,26 +109,35 @@ struct LastTailPosition(Option<Position>);
 #[derive(Event)]
 struct GameOverEvent;
 
+#[derive(Resource, Default)]
+struct Score(usize);
+
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "bevy-game".into(),
-                resolution: WindowResolution::new(RESOLUTION_WIDTH, RESOLUTION_HEIGHT)
-                    .with_scale_factor_override(1.),
-                resizable: false,
+        .add_plugins((
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "bevy-game".into(),
+                    resolution: WindowResolution::new(RESOLUTION_WIDTH, RESOLUTION_HEIGHT)
+                        .with_scale_factor_override(1.),
+                    resizable: false,
+                    ..default()
+                }),
                 ..default()
             }),
-            ..default()
-        }),))
+            FrameTimeDiagnosticsPlugin,
+        ))
         .add_plugins(bevy_framepace::FramepacePlugin)
         .insert_resource(ClearColor(COLOR_BACKGROUND))
+        .insert_resource(Msaa::Off)
         .insert_resource(Time::<Fixed>::from_seconds(0.10))
         .insert_resource(TailSegments::default())
         .insert_resource(LastTailPosition::default())
+        .insert_resource(InputBuffer::default())
+        .insert_resource(Score::default())
         .add_event::<GrowthEvent>()
         .add_event::<GameOverEvent>()
-        .add_systems(Startup, (setup, spawn_snake))
+        .add_systems(Startup, (setup, spawn_snake, debug_setup))
         .add_systems(
             FixedUpdate,
             (
@@ -125,7 +147,7 @@ fn main() {
                 game_over.after(snake_movement),
             ),
         )
-        .add_systems(Update, (input_handler, food_spawner))
+        .add_systems(Update, (debug_handler, input_handler, food_spawner))
         .add_systems(PostUpdate, (size_scaling, position_translation))
         .run();
 }
@@ -147,7 +169,6 @@ fn spawn_snake(mut commands: Commands, mut segments: ResMut<TailSegments>) {
             })
             .insert(Head {
                 direction: Direction::Up,
-                next_direction: None,
             })
             .insert(Tail)
             .insert(Position { x: 3, y: 3 })
@@ -157,8 +178,12 @@ fn spawn_snake(mut commands: Commands, mut segments: ResMut<TailSegments>) {
     ]);
 }
 
-fn input_handler(input: Res<ButtonInput<KeyCode>>, mut heads: Query<&mut Head, With<Head>>) {
-    if let Some(mut head) = heads.iter_mut().next() {
+fn input_handler(
+    input: Res<ButtonInput<KeyCode>>,
+    mut input_buffer: ResMut<InputBuffer>,
+    heads: Query<&Head, With<Head>>,
+) {
+    if let Some(head) = heads.iter().next() {
         let pressed_direction = if input.pressed(KeyCode::ArrowLeft)
             || input.pressed(KeyCode::KeyA)
             || input.pressed(KeyCode::KeyH)
@@ -184,8 +209,14 @@ fn input_handler(input: Res<ButtonInput<KeyCode>>, mut heads: Query<&mut Head, W
         };
 
         if let Some(direction) = pressed_direction {
-            if direction != head.direction.opposite() {
-                head.next_direction = Some(direction);
+            if !input_buffer.0.contains(direction) {
+                if input_buffer.0.len() == 0 {
+                    if direction != head.direction && direction != head.direction.opposite() {
+                        input_buffer.0.push(direction);
+                    }
+                } else {
+                    input_buffer.0.push(direction);
+                }
             }
         }
     }
@@ -269,6 +300,7 @@ fn food_spawner(
 
 fn snake_movement(
     segments: ResMut<TailSegments>,
+    mut input_buffer: ResMut<InputBuffer>,
     mut heads: Query<(Entity, &mut Head)>,
     mut positions: Query<&mut Position>,
     mut last_tail_position: ResMut<LastTailPosition>,
@@ -281,8 +313,7 @@ fn snake_movement(
             .map(|e| *positions.get_mut(*e).unwrap())
             .collect::<Vec<Position>>();
         let mut head_pos = positions.get_mut(head_entity).unwrap();
-        head.direction = head.next_direction.unwrap_or(head.direction);
-        head.next_direction = None;
+        head.direction = input_buffer.0.pop().unwrap_or(head.direction);
         match &head.direction {
             Direction::Left => {
                 head_pos.x -= 1;
@@ -350,11 +381,13 @@ fn snake_growth(
     last_tail_position: Res<LastTailPosition>,
     mut segments: ResMut<TailSegments>,
     mut growth_reader: EventReader<GrowthEvent>,
+    mut score: ResMut<Score>,
 ) {
     if growth_reader.read().next().is_some() {
         segments
             .0
             .push(spawn_segment(commands, last_tail_position.0.unwrap()));
+        score.0 += 1;
     }
 }
 
@@ -364,11 +397,13 @@ fn game_over(
     segments_res: ResMut<TailSegments>,
     food: Query<Entity, With<Food>>,
     segments: Query<Entity, With<Tail>>,
+    mut score: ResMut<Score>,
 ) {
     if reader.read().next().is_some() {
         for ent in food.iter().chain(segments.iter()) {
             commands.entity(ent).despawn();
         }
+        score.0 = 0;
         spawn_snake(commands, segments_res);
     }
 }
