@@ -3,13 +3,16 @@ use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, ui::node_bundles::TextBundle}
 use bevy::diagnostic::DiagnosticsStore;
 use bevy::prelude::*;
 
-use crate::{InputBuffer, Score};
-
 #[derive(Component)]
 pub struct DebugText;
 
 const HEADER_FONT_SIZE: f32 = 32.0;
 const HEADER2_FONT_SIZE: f32 = 26.0;
+
+pub(super) fn plugin(app: &mut App) {
+    app.add_systems(Startup, debug_setup);
+    app.add_systems(Update, debug_handler);
+}
 
 pub(crate) fn debug_setup(mut commands: Commands) {
     commands.spawn((
@@ -55,8 +58,8 @@ pub(crate) fn debug_setup(mut commands: Commands) {
 
 pub(crate) fn debug_handler(
     diagnostics: Res<DiagnosticsStore>,
-    input_buffer: Res<InputBuffer>,
-    score: Res<Score>,
+    // input_buffer: Res<InputBuffer>,
+    // score: Res<Score>,
     windows: Query<&Window>,
     mut query: Query<&mut Text, With<DebugText>>,
 ) {
@@ -66,8 +69,8 @@ pub(crate) fn debug_handler(
         if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
             if let Some(value) = fps.smoothed() {
                 text.sections[1].value = format!("{value:.2}");
-                text.sections[3].value = input_buffer.0.to_string();
-                text.sections[5].value = score.0.to_string();
+                // text.sections[3].value = input_buffer.0.to_string();
+                // text.sections[5].value = score.0.to_string();
             }
         }
     }
