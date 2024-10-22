@@ -109,6 +109,9 @@ struct LastTailPosition(Option<Position>);
 #[derive(Event)]
 struct GameOverEvent;
 
+#[derive(Event)]
+struct GamePauseEvent;
+
 #[derive(Resource, Default)]
 struct Score(usize);
 
@@ -128,15 +131,15 @@ fn main() {
             FrameTimeDiagnosticsPlugin,
         ))
         .add_plugins(bevy_framepace::FramepacePlugin)
-        .insert_resource(ClearColor(COLOR_BACKGROUND))
         .insert_resource(Msaa::Off)
-        .insert_resource(Time::<Fixed>::from_seconds(0.10))
+        .insert_resource(Time::<Fixed>::from_seconds(0.08))
         .insert_resource(TailSegments::default())
         .insert_resource(LastTailPosition::default())
         .insert_resource(InputBuffer::default())
         .insert_resource(Score::default())
         .add_event::<GrowthEvent>()
         .add_event::<GameOverEvent>()
+        .add_event::<GamePauseEvent>()
         .add_systems(Startup, (setup, spawn_snake, debug_setup))
         .add_systems(
             FixedUpdate,
@@ -147,14 +150,20 @@ fn main() {
                 game_over.after(snake_movement),
             ),
         )
-        .add_systems(Update, (debug_handler, input_handler, food_spawner))
+        .add_systems(Update, (debug_handler, input_handler, food_spawner, toggle_pause))
         .add_systems(PostUpdate, (size_scaling, position_translation))
         .run();
 }
 
 fn setup(mut settings: ResMut<bevy_framepace::FramepaceSettings>, mut commands: Commands) {
     settings.limiter = Limiter::from_framerate(60.);
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle {
+        camera: Camera {
+            clear_color: ClearColorConfig::Custom(COLOR_BACKGROUND),
+            ..default()
+        },
+        ..default()
+    });
 }
 
 fn spawn_snake(mut commands: Commands, mut segments: ResMut<TailSegments>) {
@@ -182,7 +191,11 @@ fn input_handler(
     input: Res<ButtonInput<KeyCode>>,
     mut input_buffer: ResMut<InputBuffer>,
     heads: Query<&Head, With<Head>>,
+    mut game_pause_writer: EventWriter<GamePauseEvent>,
 ) {
+    if input.just_pressed(KeyCode::Space) {
+        game_pause_writer.send(GamePauseEvent);
+    }
     if let Some(head) = heads.iter().next() {
         let pressed_direction = if input.pressed(KeyCode::ArrowLeft)
             || input.pressed(KeyCode::KeyA)
@@ -218,6 +231,19 @@ fn input_handler(
                     input_buffer.0.push(direction);
                 }
             }
+        }
+    }
+}
+
+fn toggle_pause(
+    mut game_pause_reader: EventReader<GamePauseEvent>,
+    mut time: ResMut<Time<Virtual>>,
+) {
+    if game_pause_reader.read().next().is_some() {
+        if time.is_paused() {
+            time.unpause();
+        } else {
+            time.pause();
         }
     }
 }
