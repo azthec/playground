@@ -9,6 +9,9 @@ bevy_framepace = "0.17.1"
 # bevy = "0.14.0" # stand-alone binary
 rand = "0.8.5"
 
+[features]
+dev = []
+
 [profile.dev]
 opt-level = 1
 

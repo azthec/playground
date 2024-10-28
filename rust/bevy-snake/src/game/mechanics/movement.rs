@@ -1,35 +1,22 @@
+use bevy::prelude::*;
 
-#[derive(Resource)]
-struct InputBuffer(LimitedQueue<Direction>);
+use crate::game::input::InputBuffer;
+use crate::game::snake::LastTailPosition;
+use crate::types::direction::Direction;
+use crate::{
+    game::{
+        game::GameOverEvent,
+        grid::{Position, GRID_HEIGHT, GRID_WIDTH},
+        snake::{Head, TailSegments},
+    },
+    FixedSet,
+};
 
-impl Default for InputBuffer {
-    fn default() -> Self {
-        InputBuffer(LimitedQueue::new(3))
-    }
+pub(super) fn plugin(app: &mut App) {
+    app.insert_resource(InputBuffer::default());
+    app.insert_resource(LastTailPosition::default());
+    app.add_systems(FixedUpdate, (snake_movement).in_set(FixedSet::Pre));
 }
-
-
-#[derive(PartialEq, Eq, Copy, Clone, Debug)]
-enum Direction {
-    Left,
-    Up,
-    Right,
-    Down,
-}
-
-impl Direction {
-    fn opposite(&self) -> Self {
-        match self {
-            Self::Left => Self::Right,
-            Self::Right => Self::Left,
-            Self::Up => Self::Down,
-            Self::Down => Self::Up,
-        }
-    }
-}
-
-#[derive(Resource, Default)]
-struct LastTailPosition(Option<Position>);
 
 fn snake_movement(
     segments: ResMut<TailSegments>,
@@ -77,4 +64,3 @@ fn snake_movement(
         *last_tail_position = LastTailPosition(Some(*segment_positions.last().unwrap()));
     }
 }
-

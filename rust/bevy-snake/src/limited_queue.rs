@@ -30,7 +30,6 @@ impl<T: Eq + Debug> LimitedQueue<T> {
 
     pub fn len(&self) -> usize {
         return self.queue.len();
-
     }
 
     // TODO rust idiomatic

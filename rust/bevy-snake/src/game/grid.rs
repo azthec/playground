@@ -1,12 +1,12 @@
+use crate::config::*;
+use bevy::prelude::*;
+
 pub const RESOLUTION_GCD: i32 = 120;
 
 // const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / RESOLUTION_GCD).floor() as i32;
 // const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / RESOLUTION_GCD).floor() as i32;
-const GRID_WIDTH: i32 = 16;
-const GRID_HEIGHT: i32 = 9;
-
-use crate::config::*;
-use bevy::prelude::*;
+pub const GRID_WIDTH: i32 = 16;
+pub const GRID_HEIGHT: i32 = 9;
 
 #[derive(Component)]
 pub struct Size {

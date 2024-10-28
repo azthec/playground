@@ -1,3 +1,26 @@
+use bevy::{
+    app::{App, Update},
+    input::ButtonInput,
+    prelude::{EventWriter, KeyCode, Query, Res, ResMut, Resource, With},
+};
+
+use crate::{limited_queue::LimitedQueue, types::direction::*};
+
+use super::{game::GamePauseEvent, snake::Head};
+
+#[derive(Resource)]
+pub struct InputBuffer(pub LimitedQueue<Direction>);
+
+impl Default for InputBuffer {
+    fn default() -> Self {
+        InputBuffer(LimitedQueue::new(3))
+    }
+}
+
+pub(super) fn plugin(app: &mut App) {
+    app.add_systems(Update, input_handler);
+}
+
 fn input_handler(
     input: Res<ButtonInput<KeyCode>>,
     mut input_buffer: ResMut<InputBuffer>,
@@ -45,4 +68,3 @@ fn input_handler(
         }
     }
 }
-

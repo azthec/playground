@@ -16,17 +16,6 @@ use bevy::{prelude::*, window::WindowResolution};
 // TODO run GDC by screen resolution on startup
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(
-        // DefaultPlugins.set(WindowPlugin {
-        //     primary_window: Window {
-        //         title: "Bevy Jam".to_string(),
-        //         canvas: Some("#bevy".to_string()),
-        //         fit_canvas_to_parent: true,
-        //         prevent_default_event_handling: true,
-        //         ..default()
-        //     }
-        //     .into(),
-        //     ..default()
-        // }),
         DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "bevy-game".into(),

@@ -1,10 +1,32 @@
-
+use crate::game::game::Score;
+use crate::game::grid::Position;
+use crate::game::grid::Size;
+use crate::game::grid::GRID_HEIGHT;
+use crate::game::grid::GRID_WIDTH;
+use crate::game::snake::GrowSnakeEvent;
+use crate::game::snake::Head;
+use crate::game::snake::Tail;
+use crate::game::snake::TailSegments;
+use crate::FixedSet;
+use crate::COLOR_FOOD;
+use bevy::prelude::*;
+use rand::prelude::SliceRandom;
+use std::collections::HashSet;
 
 #[derive(Event)]
 struct GrowthEvent;
 
 #[derive(Component)]
 struct Food;
+
+pub(super) fn plugin(app: &mut App) {
+    app.add_event::<GrowthEvent>();
+    app.add_systems(
+        FixedUpdate,
+        (snake_eating, snake_growth).chain().in_set(FixedSet::Cur),
+    );
+    app.add_systems(Update, food_spawner);
+}
 
 fn snake_eating(
     mut commands: Commands,
@@ -24,15 +46,13 @@ fn snake_eating(
 
 fn snake_growth(
     commands: Commands,
-    last_tail_position: Res<LastTailPosition>,
     mut segments: ResMut<TailSegments>,
     mut growth_reader: EventReader<GrowthEvent>,
+    mut writer: EventWriter<GrowSnakeEvent>,
     mut score: ResMut<Score>,
 ) {
     if growth_reader.read().next().is_some() {
-        segments
-            .0
-            .push(spawn_segment(commands, last_tail_position.0.unwrap()));
+        writer.send(GrowSnakeEvent);
         score.0 += 1;
     }
 }
@@ -88,4 +108,3 @@ fn food_spawner(
         }
     }
 }
-

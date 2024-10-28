@@ -1,15 +1,13 @@
 mod colorscheme;
 mod config;
+#[cfg(feature = "dev")]
 mod debug;
 mod game;
 mod limited_queue;
+mod types;
 mod window;
 
-use bevy::{
-    asset::AssetMetaCheck,
-    audio::{AudioPlugin, Volume},
-    prelude::*,
-};
+use bevy::prelude::*;
 use bevy_framepace::Limiter;
 
 use crate::config::*;
@@ -28,28 +26,18 @@ impl Plugin for AppPlugin {
         );
 
         app.add_systems(Startup, setup);
+        app.insert_resource(Time::<Fixed>::from_seconds(0.08)); // set fixed run time
         app.add_plugins(window::plugin);
         app.add_plugins(bevy_framepace::FramepacePlugin);
 
         app.add_plugins(game::plugin);
 
-        // Add other plugins.
-        // app.add_plugins((
-        //     asset_tracking::plugin,
-        //     demo::plugin,
-        //     screens::plugin,
-        //     theme::plugin,
-        // ));
-
         // Enable dev tools for dev builds.
-        // #[cfg(feature = "dev")]
-        // app.add_plugins(dev_tools::plugin);
+        #[cfg(feature = "dev")]
+        app.add_plugins(debug::plugin);
     }
 }
 
-/// High-level groupings of systems for the app in the `Update` schedule.
-/// When adding a new variant, make sure to order it in the `configure_sets`
-/// call above.
 #[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
 enum AppSet {
     TickTimers,
@@ -64,7 +52,6 @@ enum FixedSet {
     Post,
 }
 
-// fn setup(mut commands: Commands) {
 fn setup(mut settings: ResMut<bevy_framepace::FramepaceSettings>, mut commands: Commands) {
     settings.limiter = Limiter::from_framerate(60.);
     commands.spawn((
