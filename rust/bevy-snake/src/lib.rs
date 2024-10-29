@@ -18,11 +18,25 @@ impl Plugin for AppPlugin {
     fn build(&self, app: &mut App) {
         app.configure_sets(
             Update,
-            (AppSet::TickTimers, AppSet::RecordInput, AppSet::Update).chain(),
+            (
+                AppSet::Setup,
+                AppSet::PreUpdate,
+                AppSet::Update,
+                AppSet::PostUpdate,
+                AppSet::Cleanup,
+            )
+                .chain(),
         );
         app.configure_sets(
             FixedUpdate,
-            (FixedSet::Pre, FixedSet::Cur, FixedSet::Post).chain(),
+            (
+                AppSet::Setup,
+                AppSet::PreUpdate,
+                AppSet::Update,
+                AppSet::PostUpdate,
+                AppSet::Cleanup,
+            )
+                .chain(),
         );
 
         app.add_systems(Startup, setup);
@@ -40,16 +54,11 @@ impl Plugin for AppPlugin {
 
 #[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
 enum AppSet {
-    TickTimers,
-    RecordInput,
+    Setup,
+    PreUpdate,
     Update,
-}
-
-#[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
-enum FixedSet {
-    Pre,
-    Cur,
-    Post,
+    PostUpdate,
+    Cleanup,
 }
 
 fn setup(mut settings: ResMut<bevy_framepace::FramepaceSettings>, mut commands: Commands) {

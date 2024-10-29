@@ -34,7 +34,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_event::<GrowSnakeEvent>();
     app.insert_resource(TailSegments::default());
     app.add_systems(PreUpdate, (despawn, spawn).chain());
-    app.add_systems(FixedUpdate, (grow).in_set(FixedSet::Post));
+    app.add_systems(FixedUpdate, (grow).in_set(AppSet::PostUpdate));
 }
 
 fn spawn(

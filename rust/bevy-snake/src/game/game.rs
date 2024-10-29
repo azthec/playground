@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::FixedSet;
+use crate::AppSet;
 
-use super::snake::{DespawnSnakeEvent, SpawnSnakeEvent, TailSegments};
+use super::snake::{DespawnSnakeEvent, SpawnSnakeEvent};
 
 #[derive(Event)]
 pub struct GameOverEvent;
@@ -19,7 +19,7 @@ pub(super) fn plugin(app: &mut App) {
     app.insert_resource(Score::default());
     app.add_systems(Startup, spawn);
     app.add_systems(Update, toggle_pause);
-    app.add_systems(FixedUpdate, (game_over).in_set(FixedSet::Post));
+    app.add_systems(FixedUpdate, (game_over).in_set(AppSet::PostUpdate));
 }
 
 fn spawn(mut snake_spawn_writer: EventWriter<SpawnSnakeEvent>) {
@@ -27,19 +27,12 @@ fn spawn(mut snake_spawn_writer: EventWriter<SpawnSnakeEvent>) {
 }
 
 fn game_over(
-    mut commands: Commands,
     mut reader: EventReader<GameOverEvent>,
-    segments_res: ResMut<TailSegments>,
     mut snake_spawn_writer: EventWriter<SpawnSnakeEvent>,
     mut snake_despawn_writer: EventWriter<DespawnSnakeEvent>,
-    // food: Query<Entity, With<Food>>,
-    // segments: Query<Entity, With<Tail>>,
     mut score: ResMut<Score>,
 ) {
     if reader.read().next().is_some() {
-        // for ent in food.iter().chain(segments.iter()) {
-        //     commands.entity(ent).despawn();
-        // }
         score.0 = 0;
         snake_spawn_writer.send(SpawnSnakeEvent);
         snake_despawn_writer.send(DespawnSnakeEvent);

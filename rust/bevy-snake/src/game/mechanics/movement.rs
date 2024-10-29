@@ -9,13 +9,13 @@ use crate::{
         grid::{Position, GRID_HEIGHT, GRID_WIDTH},
         snake::{Head, TailSegments},
     },
-    FixedSet,
+    AppSet,
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.insert_resource(InputBuffer::default());
     app.insert_resource(LastTailPosition::default());
-    app.add_systems(FixedUpdate, (snake_movement).in_set(FixedSet::Pre));
+    app.add_systems(FixedUpdate, (snake_movement).in_set(AppSet::PreUpdate));
 }
 
 fn snake_movement(

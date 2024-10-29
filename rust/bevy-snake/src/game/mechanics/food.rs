@@ -1,3 +1,4 @@
+use crate::game::game::GameOverEvent;
 use crate::game::game::Score;
 use crate::game::grid::Position;
 use crate::game::grid::Size;
@@ -7,7 +8,7 @@ use crate::game::snake::GrowSnakeEvent;
 use crate::game::snake::Head;
 use crate::game::snake::Tail;
 use crate::game::snake::TailSegments;
-use crate::FixedSet;
+use crate::AppSet;
 use crate::COLOR_FOOD;
 use bevy::prelude::*;
 use rand::prelude::SliceRandom;
@@ -23,9 +24,11 @@ pub(super) fn plugin(app: &mut App) {
     app.add_event::<GrowthEvent>();
     app.add_systems(
         FixedUpdate,
-        (snake_eating, snake_growth).chain().in_set(FixedSet::Cur),
+        (
+            (snake_eating, snake_growth, food_spawner).chain().in_set(AppSet::Update),
+            (despawn).in_set(AppSet::Cleanup),
+        ),
     );
-    app.add_systems(Update, food_spawner);
 }
 
 fn snake_eating(
@@ -97,6 +100,18 @@ fn food_spawner(
                     })
                     .insert(Size::square(0.5));
             }
+        }
+    }
+}
+
+fn despawn(
+    mut commands: Commands,
+    mut reader: EventReader<GameOverEvent>,
+    food: Query<Entity, With<Food>>,
+) {
+    if reader.read().next().is_some() {
+        for entity in food.iter() {
+            commands.entity(entity).despawn();
         }
     }
 }
