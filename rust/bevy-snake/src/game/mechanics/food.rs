@@ -1,5 +1,5 @@
 use crate::game::game::GameOverEvent;
-use crate::game::game::Score;
+use crate::game::game::ScoreEvent;
 use crate::game::grid::Position;
 use crate::game::grid::Size;
 use crate::game::grid::GRID_HEIGHT;
@@ -25,7 +25,9 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         FixedUpdate,
         (
-            (snake_eating, snake_growth, food_spawner).chain().in_set(AppSet::Update),
+            (snake_eating, snake_growth, food_spawner)
+                .chain()
+                .in_set(AppSet::Update),
             (despawn).in_set(AppSet::Cleanup),
         ),
     );
@@ -50,11 +52,11 @@ fn snake_eating(
 fn snake_growth(
     mut growth_reader: EventReader<GrowthEvent>,
     mut writer: EventWriter<GrowSnakeEvent>,
-    mut score: ResMut<Score>,
+    mut score_writer: EventWriter<ScoreEvent>,
 ) {
     if growth_reader.read().next().is_some() {
         writer.send(GrowSnakeEvent);
-        score.0 += 1;
+        score_writer.send(ScoreEvent { amount: 1 });
     }
 }
 

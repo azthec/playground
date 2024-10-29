@@ -10,16 +10,25 @@ pub struct GameOverEvent;
 #[derive(Event)]
 pub struct GamePauseEvent;
 
+#[derive(Event)]
+pub struct ScoreEvent {
+    pub amount: usize,
+}
+
 #[derive(Resource, Default)]
 pub struct Score(pub usize);
 
 pub(super) fn plugin(app: &mut App) {
     app.add_event::<GameOverEvent>();
     app.add_event::<GamePauseEvent>();
+    app.add_event::<ScoreEvent>();
     app.insert_resource(Score::default());
     app.add_systems(Startup, spawn);
     app.add_systems(Update, toggle_pause);
-    app.add_systems(FixedUpdate, (game_over).in_set(AppSet::PostUpdate));
+    app.add_systems(
+        FixedUpdate,
+        (score, game_over).chain().in_set(AppSet::PostUpdate),
+    );
 }
 
 fn spawn(mut snake_spawn_writer: EventWriter<SpawnSnakeEvent>) {
@@ -49,5 +58,11 @@ fn toggle_pause(
         } else {
             time.pause();
         }
+    }
+}
+
+fn score(mut reader: EventReader<ScoreEvent>, mut score: ResMut<Score>) {
+    if let Some(score_increase) = reader.read().next() {
+        score.0 += score_increase.amount;
     }
 }

@@ -1,7 +1,5 @@
 mod colorscheme;
 mod config;
-#[cfg(feature = "dev")]
-mod debug;
 mod game;
 mod limited_queue;
 mod types;
@@ -45,10 +43,6 @@ impl Plugin for AppPlugin {
         app.add_plugins(bevy_framepace::FramepacePlugin);
 
         app.add_plugins(game::plugin);
-
-        // Enable dev tools for dev builds.
-        #[cfg(feature = "dev")]
-        app.add_plugins(debug::plugin);
     }
 }
 
