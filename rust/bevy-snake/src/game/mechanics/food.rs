@@ -45,8 +45,6 @@ fn snake_eating(
 }
 
 fn snake_growth(
-    commands: Commands,
-    mut segments: ResMut<TailSegments>,
     mut growth_reader: EventReader<GrowthEvent>,
     mut writer: EventWriter<GrowSnakeEvent>,
     mut score: ResMut<Score>,
@@ -70,22 +68,16 @@ fn food_spawner(
             let all_pos: HashSet<(i32, i32)> = (0..GRID_HEIGHT)
                 .flat_map(|y| (0..GRID_WIDTH).map(move |x| (x, y)))
                 .collect();
-            let head_pos: HashSet<(i32, i32)> = HashSet::from([(head_position.x, head_position.y)]);
-            let tail_pos: HashSet<(i32, i32)> = segments
+
+            let mut occupied_pos: HashSet<(i32, i32)> = segments
                 .0
                 .iter()
-                .map(|e| *positions.get(*e).unwrap())
-                .collect::<Vec<Position>>()
-                .iter()
+                .map(|segment| *positions.get(*segment).unwrap())
                 .map(|pos| (pos.x, pos.y))
                 .collect();
-            let valid_pos: Vec<(i32, i32)> = all_pos
-                .difference(&head_pos)
-                .cloned()
-                .collect::<HashSet<(i32, i32)>>()
-                .difference(&tail_pos)
-                .cloned()
-                .collect();
+            occupied_pos.insert((head_position.x, head_position.y));
+
+            let valid_pos: Vec<(i32, i32)> = all_pos.difference(&occupied_pos).cloned().collect();
 
             for random_position in
                 valid_pos.choose_multiple(&mut rand::thread_rng(), 5 - food_count)
