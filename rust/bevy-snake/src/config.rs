@@ -12,3 +12,4 @@ pub const COLOR_BACKGROUND: Color = Color::Srgba(colorscheme::BASE);
 pub const COLOR_SNAKE_HEAD: Color = Color::Srgba(colorscheme::TEXT);
 pub const COLOR_SNAKE_TAIL: Color = Color::Srgba(colorscheme::SUBTEXT0);
 pub const COLOR_FOOD: Color = Color::Srgba(colorscheme::PEACH);
+pub const COLOR_PORTAL: Color = Color::Srgba(colorscheme::MAUVE);
