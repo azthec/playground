@@ -5,8 +5,6 @@ pub const RESOLUTION_GCD: i32 = 120;
 
 // const GRID_WIDTH: i32 = (RESOLUTION_WIDTH / RESOLUTION_GCD).floor() as i32;
 // const GRID_HEIGHT: i32 = (RESOLUTION_HEIGHT / RESOLUTION_GCD).floor() as i32;
-pub const GRID_WIDTH: i32 = 16;
-pub const GRID_HEIGHT: i32 = 9;
 
 #[derive(Component)]
 pub struct Size {
@@ -34,11 +32,11 @@ pub(super) fn plugin(app: &mut App) {
 
 fn size_scaling(mut q: Query<(&Size, &mut Transform)>) {
     for (sprite_size, mut transform) in q.iter_mut() {
-        transform.scale = Vec3::new(
-            sprite_size.width / GRID_WIDTH as f32 * RESOLUTION_WIDTH,
-            sprite_size.height / GRID_HEIGHT as f32 * RESOLUTION_HEIGHT,
-            1.0,
-        );
+        // transform.scale = Vec3::new(
+        //     sprite_size.width / GRID_WIDTH as f32 * RESOLUTION_WIDTH,
+        //     sprite_size.height / GRID_HEIGHT as f32 * RESOLUTION_HEIGHT,
+        //     1.0,
+        // );
     }
 }
 
@@ -49,9 +47,11 @@ fn position_translation(mut q: Query<(&Position, &mut Transform)>) {
     }
     for (pos, mut transform) in q.iter_mut() {
         transform.translation = Vec3::new(
-            convert(pos.x as f32, RESOLUTION_WIDTH, GRID_WIDTH as f32),
-            convert(pos.y as f32, RESOLUTION_HEIGHT, GRID_HEIGHT as f32),
-            0.0,
+            pos.x as f32, 0.5, pos.y as f32
+            // convert(pos.x as f32, RESOLUTION_WIDTH, GRID_WIDTH as f32),
+            // 1.0,
+            // convert(pos.y as f32, RESOLUTION_HEIGHT, GRID_HEIGHT as f32),
         );
+        transform.rotation = Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2);
     }
 }

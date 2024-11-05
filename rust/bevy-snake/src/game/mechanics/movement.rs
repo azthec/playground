@@ -1,3 +1,5 @@
+use crate::GRID_HEIGHT;
+use crate::GRID_WIDTH;
 use bevy::prelude::*;
 
 use crate::game::input::InputBuffer;
@@ -6,7 +8,7 @@ use crate::types::direction::Direction;
 use crate::{
     game::{
         game::GameOverEvent,
-        grid::{Position, GRID_HEIGHT, GRID_WIDTH},
+        grid::Position,
         snake::{Head, TailSegments},
     },
     AppSet,

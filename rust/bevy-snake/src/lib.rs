@@ -38,7 +38,7 @@ impl Plugin for AppPlugin {
         );
 
         app.add_systems(Startup, setup);
-        app.insert_resource(Time::<Fixed>::from_seconds(0.08)); // set fixed run time
+        app.insert_resource(Time::<Fixed>::from_seconds(0.38)); // set fixed run time
         app.add_plugins(window::plugin);
         app.add_plugins(bevy_framepace::FramepacePlugin);
 
@@ -55,15 +55,42 @@ enum AppSet {
     Cleanup,
 }
 
-fn setup(mut settings: ResMut<bevy_framepace::FramepaceSettings>, mut commands: Commands) {
+fn setup(
+    mut settings: ResMut<bevy_framepace::FramepaceSettings>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     settings.limiter = Limiter::from_framerate(60.);
+
+    commands.spawn(PointLightBundle {
+        point_light: PointLight {
+            shadows_enabled: true,
+            intensity: 10_000_000.,
+            range: 100.0,
+            shadow_depth_bias: 0.2,
+            ..default()
+        },
+        transform: Transform::from_xyz(8.0, 12.0, 1.0),
+        ..default()
+    });
+
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Rectangle::new(GRID_WIDTH as f32, GRID_HEIGHT as f32)),
+        material: materials.add(COLOR_BACKGROUND),
+        transform: Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2))
+            .with_translation(Vec3::new(GRID_WIDTH as f32 / 2. - 0.5, 0., GRID_HEIGHT as f32 / 2. - 0.5)),
+        ..default()
+    });
+
     commands.spawn((
         Name::new("Camera"),
-        Camera2dBundle {
+        Camera3dBundle {
             camera: Camera {
                 clear_color: ClearColorConfig::Custom(COLOR_BACKGROUND),
                 ..default()
             },
+            transform: Transform::from_xyz(2.5 * 2., 4.5 * 2., 9.0 * 2.).looking_at(Vec3::new(GRID_WIDTH as f32 / 2., 0., GRID_HEIGHT as f32 / 2.), Vec3::Y),
             ..default()
         },
         IsDefaultUiCamera,

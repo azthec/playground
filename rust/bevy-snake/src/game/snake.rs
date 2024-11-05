@@ -1,4 +1,10 @@
+use bevy::pbr::prelude::*;
+use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
+use bevy::pbr::{Material, MaterialMeshBundle, StandardMaterial};
 use bevy::prelude::*;
+use bevy::render::mesh::Mesh;
+use bevy::render::prelude::*;
+use std::f32::consts::PI;
 
 use crate::*;
 
@@ -41,15 +47,23 @@ fn spawn(
     mut commands: Commands,
     mut reader: EventReader<SpawnSnakeEvent>,
     mut segments: ResMut<TailSegments>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     if reader.read().next().is_some() {
         *segments = TailSegments(vec![
             commands
-                .spawn(SpriteBundle {
-                    sprite: Sprite {
-                        color: COLOR_SNAKE_HEAD,
-                        ..default()
-                    },
+                // .spawn(SpriteBundle {
+                //     sprite: Sprite {
+                //         color: COLOR_SNAKE_HEAD,
+                //         ..default()
+                //     },
+                //     ..default()
+                // })
+                .spawn(PbrBundle {
+                    mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                    material: materials.add(COLOR_SNAKE_HEAD),
+                    transform: Transform::from_xyz(0.0, 0.5, 0.0),
                     ..default()
                 })
                 .insert(Head {
@@ -59,7 +73,7 @@ fn spawn(
                 .insert(Position { x: 3, y: 3 })
                 .insert(Size::square(0.8))
                 .id(),
-            spawn_segment(commands, Position { x: 3, y: 2 }),
+            spawn_segment(commands, Position { x: 3, y: 2 }, meshes, materials),
         ]);
     }
 }
@@ -81,21 +95,37 @@ fn grow(
     mut reader: EventReader<GrowSnakeEvent>,
     last_tail_position: Res<LastTailPosition>,
     mut segments: ResMut<TailSegments>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     if reader.read().next().is_some() {
-        segments
-            .0
-            .push(spawn_segment(commands, last_tail_position.0.unwrap()));
+        segments.0.push(spawn_segment(
+            commands,
+            last_tail_position.0.unwrap(),
+            meshes,
+            materials,
+        ));
     }
 }
 
-fn spawn_segment(mut commands: Commands, position: Position) -> Entity {
+fn spawn_segment(
+    mut commands: Commands,
+    position: Position,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) -> Entity {
     commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                color: COLOR_SNAKE_TAIL,
-                ..default()
-            },
+        // .spawn(SpriteBundle {
+        //     sprite: Sprite {
+        //         color: COLOR_SNAKE_TAIL,
+        //         ..default()
+        //     },
+        //     ..default()
+        // })
+        .spawn(PbrBundle {
+            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+            material: materials.add(COLOR_SNAKE_TAIL),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         })
         .insert(Tail)

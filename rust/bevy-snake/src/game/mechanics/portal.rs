@@ -1,4 +1,8 @@
+use crate::GRID_HEIGHT;
+use crate::GRID_WIDTH;
 use bevy::prelude::*;
+use rand::prelude::SliceRandom;
+use rand::prelude::*;
 
 use crate::{
     game::{
@@ -18,26 +22,48 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(FixedUpdate, (teleport).in_set(AppSet::PreUpdate));
 }
 
-fn spawn(mut commands: Commands) {
-    let pos1 = Position { x: 2, y: 4 };
-    let pos2 = Position { x: 7, y: 7 };
+fn spawn(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let pos1 = Position {
+        x: thread_rng().gen_range(0..GRID_WIDTH),
+        y: thread_rng().gen_range(0..GRID_HEIGHT),
+    };
+    let pos2 = Position {
+        x: thread_rng().gen_range(0..GRID_WIDTH),
+        y: thread_rng().gen_range(0..GRID_HEIGHT),
+    };
     commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                color: COLOR_PORTAL,
-                ..default()
-            },
+        // .spawn(SpriteBundle {
+        //     sprite: Sprite {
+        //         color: COLOR_PORTAL,
+        //         ..default()
+        //     },
+        //     ..default()
+        // })
+        .spawn(PbrBundle {
+            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+            material: materials.add(COLOR_PORTAL),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         })
         .insert(Portal { to: pos1 })
         .insert(pos2)
         .insert(Size::square(0.5));
     commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                color: COLOR_PORTAL,
-                ..default()
-            },
+        // .spawn(SpriteBundle {
+        //     sprite: Sprite {
+        //         color: COLOR_PORTAL,
+        //         ..default()
+        //     },
+        //     ..default()
+        // })
+        .spawn(PbrBundle {
+            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+            material: materials.add(COLOR_PORTAL),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         })
         .insert(Portal { to: pos2 })

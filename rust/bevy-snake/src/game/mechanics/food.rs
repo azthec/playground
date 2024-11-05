@@ -2,8 +2,8 @@ use crate::game::game::GameOverEvent;
 use crate::game::game::ScoreEvent;
 use crate::game::grid::Position;
 use crate::game::grid::Size;
-use crate::game::grid::GRID_HEIGHT;
-use crate::game::grid::GRID_WIDTH;
+use crate::GRID_HEIGHT;
+use crate::GRID_WIDTH;
 use crate::game::snake::GrowSnakeEvent;
 use crate::game::snake::Head;
 use crate::game::snake::Tail;
@@ -66,6 +66,8 @@ fn food_spawner(
     mut commands: Commands,
     heads: Query<&Position, With<Head>>,
     positions: Query<&Position, With<Tail>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let food_count = food_query.into_iter().count();
     if food_count < 5 {
@@ -88,11 +90,17 @@ fn food_spawner(
                 valid_pos.choose_multiple(&mut rand::thread_rng(), 5 - food_count)
             {
                 commands
-                    .spawn(SpriteBundle {
-                        sprite: Sprite {
-                            color: COLOR_FOOD,
-                            ..default()
-                        },
+                    // .spawn(SpriteBundle {
+                    //     sprite: Sprite {
+                    //         color: COLOR_FOOD,
+                    //         ..default()
+                    //     },
+                    //     ..default()
+                    // })
+                    .spawn(PbrBundle {
+                        mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                        material: materials.add(COLOR_FOOD),
+                        transform: Transform::from_xyz(0.0, 0.5, 0.0),
                         ..default()
                     })
                     .insert(Food)
