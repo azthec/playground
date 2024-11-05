@@ -4,10 +4,9 @@ A repository for personal projects. From fully fledged cloud continuous deployed
 
 ## Projects
 
-- [./java/quarkus-smallrye-jwt](Quarkus smallrye JWT token based endpoint authentication prototype)
-- [./infra/tracing-tempo-otel](Distributed tracing and monitoring setup with OpenTelemetry, Tempo, and Grafana)
-- [./rust/bevy-snake](A snake game built with the Bevy game engine)
-- [./rust/bevy-sand](A sand simulation using the Bevy game engine)
-- [./rust/raylib-sand](A sand simulation using the Raylib library)
-- [./rust/advent-of-code-2023](Some solutions to the Advent of Code 2023 challenges)
-
+- [Quarkus smallrye JWT token based endpoint authentication prototype](./java/quarkus-smallrye-jwt)
+- [Distributed tracing and monitoring setup with OpenTelemetry, Tempo, and Grafana](./infra/tracing-tempo-otel)
+- [A snake game built with the Bevy game engine](./rust/bevy-snake)
+- [A sand simulation using the Bevy game engine](./rust/bevy-sand)
+- [A sand simulation using the Raylib library](./rust/raylib-sand)
+- [Some solutions to the Advent of Code 2023 challenges](./rust/advent-of-code-2023)
