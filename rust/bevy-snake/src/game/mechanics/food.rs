@@ -2,14 +2,14 @@ use crate::game::game::GameOverEvent;
 use crate::game::game::ScoreEvent;
 use crate::game::grid::Position;
 use crate::game::grid::Size;
-use crate::GRID_HEIGHT;
-use crate::GRID_WIDTH;
 use crate::game::snake::GrowSnakeEvent;
 use crate::game::snake::Head;
 use crate::game::snake::Tail;
 use crate::game::snake::TailSegments;
 use crate::AppSet;
 use crate::COLOR_FOOD;
+use crate::GRID_HEIGHT;
+use crate::GRID_WIDTH;
 use bevy::prelude::*;
 use rand::prelude::SliceRandom;
 use std::collections::HashSet;
@@ -17,11 +17,12 @@ use std::collections::HashSet;
 #[derive(Event)]
 struct GrowthEvent;
 
-#[derive(Component)]
-struct Food;
+#[derive(Component, Reflect)]
+pub struct Food;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_event::<GrowthEvent>();
+    app.register_type::<Food>();
     app.add_systems(
         FixedUpdate,
         (
@@ -97,12 +98,15 @@ fn food_spawner(
                     //     },
                     //     ..default()
                     // })
-                    .spawn(PbrBundle {
-                        mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-                        material: materials.add(COLOR_FOOD),
-                        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-                        ..default()
-                    })
+                    .spawn((
+                        Name::new("Food"),
+                        PbrBundle {
+                            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                            material: materials.add(COLOR_FOOD),
+                            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+                            ..default()
+                        },
+                    ))
                     .insert(Food)
                     .insert(Position {
                         x: random_position.0,

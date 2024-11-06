@@ -12,12 +12,13 @@ use crate::{
     AppSet, COLOR_PORTAL,
 };
 
-#[derive(Component)]
-struct Portal {
+#[derive(Component, Reflect)]
+pub struct Portal {
     to: Position,
 }
 
 pub(super) fn plugin(app: &mut App) {
+    app.register_type::<Portal>();
     app.add_systems(Startup, spawn);
     app.add_systems(FixedUpdate, (teleport).in_set(AppSet::PreUpdate));
 }
@@ -43,12 +44,19 @@ fn spawn(
         //     },
         //     ..default()
         // })
-        .spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(COLOR_PORTAL),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        })
+        .spawn((
+            Name::new("Portal"),
+            PbrBundle {
+                mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                material: materials.add(StandardMaterial {
+                    base_color: COLOR_PORTAL,
+                    depth_bias: 100.,
+                    ..default()
+                }),
+                transform: Transform::from_xyz(0.0, 0.5, 0.0),
+                ..default()
+            },
+        ))
         .insert(Portal { to: pos1 })
         .insert(pos2)
         .insert(Size::square(0.5));
@@ -60,12 +68,19 @@ fn spawn(
         //     },
         //     ..default()
         // })
-        .spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(COLOR_PORTAL),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        })
+        .spawn((
+            Name::new("Portal"),
+            PbrBundle {
+                mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                material: materials.add(StandardMaterial {
+                    base_color: COLOR_PORTAL,
+                    depth_bias: 100.,
+                    ..default()
+                }),
+                transform: Transform::from_xyz(0.0, 0.5, 0.0),
+                ..default()
+            },
+        ))
         .insert(Portal { to: pos2 })
         .insert(pos1)
         .insert(Size::square(0.5));

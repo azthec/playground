@@ -7,6 +7,7 @@ mod window;
 
 use bevy::prelude::*;
 use bevy_framepace::Limiter;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::config::*;
 
@@ -43,6 +44,8 @@ impl Plugin for AppPlugin {
         app.add_plugins(bevy_framepace::FramepacePlugin);
 
         app.add_plugins(game::plugin);
+
+        app.add_plugins(WorldInspectorPlugin::new());
     }
 }
 
@@ -63,25 +66,37 @@ fn setup(
 ) {
     settings.limiter = Limiter::from_framerate(60.);
 
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            shadows_enabled: true,
-            intensity: 10_000_000.,
-            range: 100.0,
-            shadow_depth_bias: 0.2,
+    commands.spawn((
+        Name::new("PointLight"),
+        PointLightBundle {
+            point_light: PointLight {
+                // shadows_enabled: true,
+                intensity: 10_000_000.,
+                range: 100.0,
+                shadow_depth_bias: 0.2,
+                ..default()
+            },
+            transform: Transform::from_xyz(8.0, 12.0, 1.0),
             ..default()
         },
-        transform: Transform::from_xyz(8.0, 12.0, 1.0),
-        ..default()
-    });
+    ));
 
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Rectangle::new(GRID_WIDTH as f32, GRID_HEIGHT as f32)),
-        material: materials.add(COLOR_BACKGROUND),
-        transform: Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2))
-            .with_translation(Vec3::new(GRID_WIDTH as f32 / 2. - 0.5, 0., GRID_HEIGHT as f32 / 2. - 0.5)),
-        ..default()
-    });
+    commands.spawn((
+        Name::new("Plane"),
+        PbrBundle {
+            mesh: meshes.add(Rectangle::new(GRID_WIDTH as f32, GRID_HEIGHT as f32)),
+            material: materials.add(COLOR_BACKGROUND),
+            transform: Transform::from_rotation(Quat::from_rotation_x(
+                -std::f32::consts::FRAC_PI_2,
+            ))
+            .with_translation(Vec3::new(
+                GRID_WIDTH as f32 / 2. - 0.5,
+                0.,
+                GRID_HEIGHT as f32 / 2. - 0.5,
+            )),
+            ..default()
+        },
+    ));
 
     commands.spawn((
         Name::new("Camera"),
@@ -90,7 +105,10 @@ fn setup(
                 clear_color: ClearColorConfig::Custom(COLOR_BACKGROUND),
                 ..default()
             },
-            transform: Transform::from_xyz(2.5 * 2., 4.5 * 2., 9.0 * 2.).looking_at(Vec3::new(GRID_WIDTH as f32 / 2., 0., GRID_HEIGHT as f32 / 2.), Vec3::Y),
+            transform: Transform::from_xyz(2.5 * 2., 4.5 * 2., 9.0 * 2.).looking_at(
+                Vec3::new(GRID_WIDTH as f32 / 2., 0., GRID_HEIGHT as f32 / 2.),
+                Vec3::Y,
+            ),
             ..default()
         },
         IsDefaultUiCamera,

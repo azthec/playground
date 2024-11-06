@@ -40,7 +40,7 @@ fn input_handler(
             || input.pressed(KeyCode::KeyS)
             || input.pressed(KeyCode::KeyJ)
         {
-            Some(Direction::Up)  // TODO extremely hacky perspective fix
+            Some(Direction::Up) // TODO extremely hacky perspective fix
         } else if input.pressed(KeyCode::ArrowUp)
             || input.pressed(KeyCode::KeyW)
             || input.pressed(KeyCode::KeyK)

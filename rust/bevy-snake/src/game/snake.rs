@@ -60,12 +60,15 @@ fn spawn(
                 //     },
                 //     ..default()
                 // })
-                .spawn(PbrBundle {
-                    mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-                    material: materials.add(COLOR_SNAKE_HEAD),
-                    transform: Transform::from_xyz(0.0, 0.5, 0.0),
-                    ..default()
-                })
+                .spawn((
+                    Name::new("Head"),
+                    PbrBundle {
+                        mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                        material: materials.add(COLOR_SNAKE_HEAD),
+                        transform: Transform::from_xyz(0.0, 0.5, 0.0),
+                        ..default()
+                    },
+                ))
                 .insert(Head {
                     direction: Direction::Up,
                 })
@@ -122,12 +125,15 @@ fn spawn_segment(
         //     },
         //     ..default()
         // })
-        .spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(COLOR_SNAKE_TAIL),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        })
+        .spawn((
+            Name::new("Tail"),
+            PbrBundle {
+                mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+                material: materials.add(COLOR_SNAKE_TAIL),
+                transform: Transform::from_xyz(0.0, 0.5, 0.0),
+                ..default()
+            },
+        ))
         .insert(Tail)
         .insert(position)
         .insert(Size::square(0.65))

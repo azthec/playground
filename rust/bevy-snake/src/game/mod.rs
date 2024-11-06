@@ -1,9 +1,9 @@
+mod debug;
 mod game;
 mod grid;
 mod input;
 mod mechanics;
 mod snake;
-mod debug;
 
 use bevy::prelude::*;
 

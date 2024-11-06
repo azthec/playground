@@ -20,7 +20,7 @@ impl Size {
     }
 }
 
-#[derive(Component, Clone, Copy, PartialEq, Eq)]
+#[derive(Component, Clone, Copy, PartialEq, Eq, Reflect)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
@@ -47,10 +47,11 @@ fn position_translation(mut q: Query<(&Position, &mut Transform)>) {
     }
     for (pos, mut transform) in q.iter_mut() {
         transform.translation = Vec3::new(
-            pos.x as f32, 0.5, pos.y as f32
-            // convert(pos.x as f32, RESOLUTION_WIDTH, GRID_WIDTH as f32),
-            // 1.0,
-            // convert(pos.y as f32, RESOLUTION_HEIGHT, GRID_HEIGHT as f32),
+            pos.x as f32,
+            0.5,
+            pos.y as f32, // convert(pos.x as f32, RESOLUTION_WIDTH, GRID_WIDTH as f32),
+                          // 1.0,
+                          // convert(pos.y as f32, RESOLUTION_HEIGHT, GRID_HEIGHT as f32),
         );
         transform.rotation = Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2);
     }

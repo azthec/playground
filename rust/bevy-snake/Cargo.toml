@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.14.2", features = ["dynamic_linking"] }
+bevy-inspector-egui = "0.27.0"
 bevy_framepace = "0.17.1"
 # bevy = "0.14.0" # stand-alone binary
 rand = "0.8.5"
