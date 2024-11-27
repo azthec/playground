@@ -1,5 +1,6 @@
 mod error_views;
 mod templates;
+mod components;
 
 use perseus::{plugins::Plugins, prelude::*};
 
@@ -17,6 +18,7 @@ pub fn main<G: Html>() -> PerseusApp<G> {
     .static_alias("/tailwind.css", "dist/tailwind.css")
     .template(crate::templates::index::get_template())
     .template(crate::templates::about::get_template())
-    .template(crate::templates::new_index::get_template())
+    .template(crate::templates::cv::get_template())
+    .template(crate::templates::test::get_template())
     .error_views(crate::error_views::get_error_views())
 }

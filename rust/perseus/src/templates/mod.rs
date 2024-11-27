@@ -1,3 +1,4 @@
 pub mod index;
 pub mod about;
-pub mod new_index;
+pub mod cv;
+pub mod test;
