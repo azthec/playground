@@ -1,19 +1,19 @@
 object y24d1 {
-  def execute(): Unit = {
-    val input = ResourceReader.load("y24d1")
-    val (left, right) = parseInput(input)
+  def execute(input: List[String] = ResourceReader.load("y24d1")): Unit = {
+    val (left, right) = parse(input)
     require(left.length == right.length, "Lists must be of the same size")
 
-    println(f"Part One: ${part1(left, right)}")
-    println(f"Part Two: ${part2(left, right)}")
+    val (timer1, result1) = Timer.time(part1(left, right))
+    val (timer2, result2) = Timer.time(part2(left, right))
+    println(f"Elapsed time: $timer1 ms | Result: ${result1}")
+    println(f"Elapsed time: $timer2 ms | Result: ${result2}")
   }
 
-  private def parseInput(lines: List[String]): (List[Int], List[Int]) = {
-    val parsedLines = lines.map { line =>
+  def parse(lines: List[String]): (List[Int], List[Int]) = {
+    lines.map { line =>
       val Array(first, second) = line.trim.split("\\s+").map(_.toInt)
       (first, second)
-    }
-    parsedLines.unzip
+    }.unzip
   }
 
   def part1(left: List[Int], right: List[Int]): Int = {
