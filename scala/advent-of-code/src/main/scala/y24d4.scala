@@ -29,26 +29,6 @@ object y24d4 {
         .count(_ == true)
     }
 
-    def diagonals(lines: List[List[Char]]): List[List[Char]] = {
-      val tophalf: List[List[Char]] =
-        (for (i <- 1 until lines.size) yield {
-          (for (j <- 0 until lines.size if i + j < lines.size) yield {
-            lines(j)(i + j)
-          }).toList
-        }).toList
-
-      val middle = List((0 to lines.size - 1).map { i => lines(i)(i) }.toList)
-
-      val bottomhalf: List[List[Char]] =
-        (for (i <- 1 until lines.size) yield {
-          (for (j <- 0 until lines.size if i + j < lines.size) yield {
-            lines(i + j)(j)
-          }).toList
-        }).toList
-
-      return tophalf ++ middle ++ bottomhalf
-    }
-
     val horizontals = lines
     val verticals = lines.transpose
     val rights = diagonals(lines)
@@ -74,5 +54,25 @@ object y24d4 {
 
       sam(right) && sam(left)
     }).count(identity)
+  }
+
+  def diagonals(lines: List[List[Char]]): List[List[Char]] = {
+    val tophalf: List[List[Char]] =
+      (for (i <- 1 until lines.size) yield {
+        (for (j <- 0 until lines.size if i + j < lines.size) yield {
+          lines(j)(i + j)
+        }).toList
+      }).toList
+
+    val middle = List((0 to lines.size - 1).map { i => lines(i)(i) }.toList)
+
+    val bottomhalf: List[List[Char]] =
+      (for (i <- 1 until lines.size) yield {
+        (for (j <- 0 until lines.size if i + j < lines.size) yield {
+          lines(i + j)(j)
+        }).toList
+      }).toList
+
+    return tophalf ++ middle ++ bottomhalf
   }
 }
