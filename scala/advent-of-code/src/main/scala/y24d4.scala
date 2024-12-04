@@ -10,45 +10,45 @@ object y24d4 {
 
   def parse(lines: List[String]): List[List[Char]] = lines.map(_.toList)
 
-  def counts(lines: List[List[Char]]): Int = lines.map(count(_)).sum
-
-  def count(line: List[Char]): Int = {
-    line
-      .sliding(4)
-      .collect { case List(a, b, c, d) =>
-        (a, b, c, d) // ignore any smaller than 4
-      }
-      .map {
-        _ match {
-          case Tuple4('X', 'M', 'A', 'S') => true
-          case Tuple4('S', 'A', 'M', 'X') => true
-          case _                          => false
-        }
-      }
-      .count(_ == true)
-  }
-
-  def diagonals(lines: List[List[Char]]): List[List[Char]] = {
-    val tophalf: List[List[Char]] =
-      (for (i <- 1 until lines.size) yield {
-        (for (j <- 0 until lines.size if i + j < lines.size) yield {
-          lines(j)(i + j)
-        }).toList
-      }).toList
-
-    val middle = List((0 to lines.size - 1).map { i => lines(i)(i) }.toList)
-
-    val bottomhalf: List[List[Char]] =
-      (for (i <- 1 until lines.size) yield {
-        (for (j <- 0 until lines.size if i + j < lines.size) yield {
-          lines(i + j)(j)
-        }).toList
-      }).toList
-
-    return tophalf ++ middle ++ bottomhalf
-  }
-
   def part1(lines: List[List[Char]]): Int = {
+    def counts(lines: List[List[Char]]): Int = lines.map(count(_)).sum
+
+    def count(line: List[Char]): Int = {
+      line
+        .sliding(4)
+        .collect { case List(a, b, c, d) =>
+          (a, b, c, d) // ignore any smaller than 4
+        }
+        .map {
+          _ match {
+            case Tuple4('X', 'M', 'A', 'S') => true
+            case Tuple4('S', 'A', 'M', 'X') => true
+            case _                          => false
+          }
+        }
+        .count(_ == true)
+    }
+
+    def diagonals(lines: List[List[Char]]): List[List[Char]] = {
+      val tophalf: List[List[Char]] =
+        (for (i <- 1 until lines.size) yield {
+          (for (j <- 0 until lines.size if i + j < lines.size) yield {
+            lines(j)(i + j)
+          }).toList
+        }).toList
+
+      val middle = List((0 to lines.size - 1).map { i => lines(i)(i) }.toList)
+
+      val bottomhalf: List[List[Char]] =
+        (for (i <- 1 until lines.size) yield {
+          (for (j <- 0 until lines.size if i + j < lines.size) yield {
+            lines(i + j)(j)
+          }).toList
+        }).toList
+
+      return tophalf ++ middle ++ bottomhalf
+    }
+
     val horizontals = lines
     val verticals = lines.transpose
     val rights = diagonals(lines)
@@ -57,5 +57,22 @@ object y24d4 {
     counts(horizontals) + counts(verticals) + counts(rights) + counts(lefts)
   }
 
-  def part2(lines: List[List[Char]]): Unit = {}
+  def part2(lines: List[List[Char]]): Int = {
+    (for
+      x <- 1 to lines.size - 2 // skip first and last row
+      y <- 1 to lines.size - 2 // skip first and last col
+      if lines(x)(y) == 'A' // look for the middle letter
+    yield {
+      def sam(tuple: (Char, Char, Char)) = tuple match {
+        case Tuple3('M', 'A', 'S') => true
+        case Tuple3('S', 'A', 'M') => true
+        case _                     => false
+      }
+
+      val right = (lines(x - 1)(y - 1), lines(x)(y), lines(x + 1)(y + 1))
+      val left = (lines(x + 1)(y - 1), lines(x)(y), lines(x - 1)(y + 1))
+
+      sam(right) && sam(left)
+    }).count(identity)
+  }
 }

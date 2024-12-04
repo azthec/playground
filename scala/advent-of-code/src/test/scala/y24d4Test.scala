@@ -46,4 +46,23 @@ class y24d4Test extends munit.FunSuite {
     val actual = y24d4.part1(parsed)
     assertEquals(actual, expected)
   }
+
+  test("should count part 2 valid xmas occurrences") {
+    val expected = 9
+    val input = List(
+      "MMMSXXMASM",
+      "MSAMXMSMSA",
+      "AMXSXMAAMM",
+      "MSAMASMSMX",
+      "XMASAMXAMM",
+      "XXAMMXXAMA",
+      "SMSMSASXSS",
+      "SAXAMASAAA",
+      "MAMMMXMMMM",
+      "MXMXAXMASX"
+    )
+    val parsed = y24d4.parse(input)
+    val actual = y24d4.part2(parsed)
+    assertEquals(actual, expected)
+  }
 }
