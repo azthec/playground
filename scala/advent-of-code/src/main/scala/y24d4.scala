@@ -29,24 +29,32 @@ object y24d4 {
   }
 
   def diagonals(lines: List[List[Char]]): List[List[Char]] = {
-    (for {
-      i <- lines.indices
-      j <- lines.indices
-      if i + j < lines.size
-    } yield {
-      (for {
-        k <- 0 until lines.size - i - j
-      } yield lines(i + k)(j + k)).toList
-    }).toList
+    val tophalf: List[List[Char]] =
+      (for (i <- 1 until lines.size) yield {
+        (for (j <- 0 until lines.size if i + j < lines.size) yield {
+          lines(j)(i + j)
+        }).toList
+      }).toList
+
+    val middle = List((0 to lines.size - 1).map { i => lines(i)(i) }.toList)
+
+    val bottomhalf: List[List[Char]] =
+      (for (i <- 1 until lines.size) yield {
+        (for (j <- 0 until lines.size if i + j < lines.size) yield {
+          lines(i + j)(j)
+        }).toList
+      }).toList
+
+    return tophalf ++ middle ++ bottomhalf
   }
 
   def part1(lines: List[List[Char]]): Int = {
     val horizontals = lines
     val verticals = lines.transpose
-    val rightDiagonals = diagonals(lines)
-    val leftDiagonals = diagonals(lines.map(_.reverse))
+    val rights = diagonals(lines)
+    val lefts = diagonals(lines.map(_.reverse))
 
-    counts(horizontals) + counts(verticals) + counts(rightDiagonals) + counts(leftDiagonals)
+    counts(horizontals) + counts(verticals) + counts(rights) + counts(lefts)
   }
 
   def part2(lines: List[List[Char]]): Unit = {}
