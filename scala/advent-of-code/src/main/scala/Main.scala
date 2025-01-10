@@ -11,6 +11,7 @@ object Main {
       case Array("y24d8")  => y24d8.execute()
       case Array("y24d9")  => y24d9.execute()
       case Array("y24d10")  => y24d10.execute()
+      case Array("y24d11")  => y24d11.execute()
       case _               => options(true)
     }
   }
@@ -31,6 +32,7 @@ object Main {
       |  y24d8    Advent of Code 2024 Day 8
       |  y24d9    Advent of Code 2024 Day 9
       |  y24d10   Advent of Code 2024 Day 10
+      |  y24d11   Advent of Code 2024 Day 11
       |
       |Options:
       |  none
