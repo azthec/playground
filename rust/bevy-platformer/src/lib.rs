@@ -5,6 +5,7 @@ mod demo;
 mod dev_tools;
 mod screens;
 mod theme;
+mod physics;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -62,6 +63,7 @@ impl Plugin for AppPlugin {
             demo::plugin,
             screens::plugin,
             theme::plugin,
+            physics::plugin,
         ));
 
         // Enable dev tools for dev builds.
@@ -88,10 +90,8 @@ fn spawn_camera(mut commands: Commands) {
         Name::new("Camera"),
         Camera2d,
         OrthographicProjection {
-            scale: 0.5,
             ..OrthographicProjection::default_2d()
         },
-        Transform::from_xyz(1280.0 / 4.0, 720.0 / 4.0, 0.0),
         IsDefaultUiCamera,
     ));
 }

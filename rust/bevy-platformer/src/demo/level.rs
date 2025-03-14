@@ -29,7 +29,6 @@ impl Command for SpawnLevel {
         if let Some(level_assets) = level_assets {
             world.spawn((
                 LdtkWorldBundle {
-                    // ldtk_handle: test.into(),
                     ldtk_handle: level_assets.ldtk_project.clone().into(),
                     ..Default::default()
                 },
@@ -44,10 +43,16 @@ impl Command for SpawnLevel {
 pub struct LevelAssets {
     #[dependency]
     pub ldtk_project: Handle<LdtkProject>,
+    #[dependency]
+    pub audio_steps: Vec<Handle<AudioSource>>,
 }
 
 impl LevelAssets {
     pub const PATH_LTDK_PROJECT: &'static str = "platformer.ldtk";
+    pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.ogg";
+    pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.ogg";
+    pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.ogg";
+    pub const PATH_STEP_4: &'static str = "audio/sound_effects/step4.ogg";
 }
 
 impl FromWorld for LevelAssets {
@@ -55,6 +60,12 @@ impl FromWorld for LevelAssets {
         let assets = world.resource::<AssetServer>();
         Self {
             ldtk_project: assets.load(LevelAssets::PATH_LTDK_PROJECT),
+            audio_steps: vec![
+                assets.load(LevelAssets::PATH_STEP_1),
+                assets.load(LevelAssets::PATH_STEP_2),
+                assets.load(LevelAssets::PATH_STEP_3),
+                assets.load(LevelAssets::PATH_STEP_4),
+            ],
         }
     }
 }
