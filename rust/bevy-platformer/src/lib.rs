@@ -23,9 +23,6 @@ impl Plugin for AppPlugin {
             (AppSet::TickTimers, AppSet::RecordInput, AppSet::Update).chain(),
         );
 
-        // Spawn the main camera.
-        app.add_systems(Startup, spawn_camera);
-
         // Add Bevy plugins.
         app.add_plugins(
             DefaultPlugins
@@ -83,15 +80,4 @@ enum AppSet {
     RecordInput,
     /// Do everything else (consider splitting this into further variants).
     Update,
-}
-
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn((
-        Name::new("Camera"),
-        Camera2d,
-        OrthographicProjection {
-            ..OrthographicProjection::default_2d()
-        },
-        IsDefaultUiCamera,
-    ));
 }
