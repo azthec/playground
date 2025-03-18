@@ -1,7 +1,7 @@
 //! Spawn the main level.
 
 use bevy::prelude::*;
-use bevy_ecs_ldtk::{assets::LdtkProject, LdtkPlugin, LdtkWorldBundle, LevelSelection};
+use bevy_ecs_ldtk::{assets::LdtkProject, LdtkPlugin, LdtkWorldBundle, LevelIid, LevelSelection, Respawn};
 
 use crate::{asset_tracking::LoadResource, screens::Screen};
 
@@ -17,7 +17,6 @@ pub struct Level {
     pub id: usize,
 }
 
-// Spawn level command
 #[derive(Debug)]
 pub struct SpawnLevel {
     pub level: Level,
@@ -36,6 +35,17 @@ impl Command for SpawnLevel {
             ));
             world.insert_resource(LevelSelection::index(self.level.id));
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct RespawnLevel;
+
+impl Command for RespawnLevel {
+    fn apply(self, world: &mut World) {
+        let mut query = world.query_filtered::<Entity, With<LevelIid>>();
+        let entity: Entity = query.single(&world);
+        world.commands().entity(entity).insert(Respawn);
     }
 }
 
