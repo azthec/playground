@@ -61,7 +61,7 @@ fn update_camera(
         .smooth_nudge(&direction, CAMERA_DECAY_RATE, time.delta_secs());
 }
 
-fn fit_camera(mut camera_query: Query<&mut OrthographicProjection, Without<Player>>) {
+fn fit_camera(mut camera_query: Query<&mut OrthographicProjection, (With<IsDefaultUiCamera>, Without<Player>)>) {
     let mut projection = camera_query.single_mut();
 
     let ratio = WIDTH / HEIGHT;
@@ -77,7 +77,7 @@ fn fit_camera(mut camera_query: Query<&mut OrthographicProjection, Without<Playe
 }
 
 fn clamp_camera(
-    mut camera_query: Query<(&OrthographicProjection, &mut Transform), Without<Player>>,
+    mut camera_query: Query<(&OrthographicProjection, &mut Transform), (With<IsDefaultUiCamera>, Without<Player>)>,
     level_query: Query<&LevelIid, (Without<OrthographicProjection>, Without<Player>)>,
     ldtk_projects: Query<&LdtkProjectHandle>,
     level_selection: Res<LevelSelection>,

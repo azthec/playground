@@ -11,7 +11,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<MovementController>();
     app.add_systems(
         Update,
-        (apply_movement, apply_movement_player).in_set(AppSet::Update),
+        (apply_movement_player).in_set(AppSet::Update),
     );
 }
 
@@ -19,7 +19,6 @@ pub(super) fn plugin(app: &mut App) {
 #[reflect(Component)]
 pub struct MovementController {
     pub intents: Vec<PlayerInput>,
-    pub intent: Vec2,
     pub max_speed: f32,
     pub jump_speed: f32,
     pub fall_speed: f32,
@@ -29,7 +28,6 @@ impl Default for MovementController {
     fn default() -> Self {
         Self {
             intents: Vec::new(),
-            intent: Vec2::ZERO,
             max_speed: 200.,
             jump_speed: 400.,
             fall_speed: 200.,
@@ -39,15 +37,6 @@ impl Default for MovementController {
 
 // MovementController is where the entity wants to move,
 // Transform is the actual rendered model location
-fn apply_movement(
-    mut query: Query<(&MovementController, &GroundDetection, &mut Velocity), Without<Player>>,
-) {
-    for (controller, _ground, mut velocity) in &mut query {
-        let intended_velocity = controller.max_speed * controller.intent;
-        velocity.linvel = intended_velocity;
-    }
-}
-
 fn apply_movement_player(
     mut query: Query<(&MovementController, &GroundDetection, &mut Velocity), With<Player>>,
 ) {

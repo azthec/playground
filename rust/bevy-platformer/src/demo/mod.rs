@@ -9,7 +9,7 @@ mod camera;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
-        // animation::plugin,
+        animation::plugin,
         entities::plugin,
         input::plugin,
         level::plugin,
