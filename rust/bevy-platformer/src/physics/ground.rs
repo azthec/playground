@@ -20,11 +20,10 @@ pub fn spawn_ground_sensor(
     detect_ground_for: Query<(Entity, &Collider), Added<GroundDetection>>,
 ) {
     for (entity, shape) in &detect_ground_for {
-        if let Some(cuboid) = shape.as_cuboid() {
-            let Vec2 {
-                x: half_extents_x,
-                y: half_extents_y,
-            } = cuboid.half_extents();
+        // TODO this logic is hardcoded for a capsule shape, it won't work for other colliders
+        if let Some(capsule) = shape.as_capsule() {
+            let half_extents_x = capsule.radius();
+            let half_extents_y = capsule.height();
 
             let detector_shape = Collider::cuboid(half_extents_x / 2.0, 2.);
 
