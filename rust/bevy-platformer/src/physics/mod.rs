@@ -1,5 +1,6 @@
 pub mod colliders;
 pub mod ground;
+pub mod spike;
 mod walls;
 
 use bevy::prelude::*;
@@ -12,7 +13,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_plugins(RapierDebugRenderPlugin::default().disabled());
     app.add_systems(Startup, setup);
     app.add_systems(Update, (toggle_debug).run_if(in_state(Screen::Gameplay)));
-    app.add_plugins((walls::WallPlugin, ground::GroundDetectionPlugin));
+    app.add_plugins((walls::WallPlugin, ground::GroundDetectionPlugin, spike::SpikeDetectionPlugin));
 }
 
 pub fn setup(mut rapier_config: Query<&mut RapierConfiguration>) {

@@ -57,6 +57,22 @@ pub struct SensorBundle {
     pub rotation_constraints: LockedAxes,
 }
 
+impl From<&EntityInstance> for SensorBundle {
+    fn from(entity_instance: &EntityInstance) -> SensorBundle {
+        let rotation_constraints = LockedAxes::ROTATION_LOCKED;
+
+        match entity_instance.identifier.as_ref() {
+            "Spike" => SensorBundle {
+                collider: Collider::capsule_x(5., 4.),
+                sensor: Sensor,
+                rotation_constraints,
+                active_events: ActiveEvents::COLLISION_EVENTS,
+            },
+            _ => SensorBundle::default(),
+        }
+    }
+}
+
 impl From<IntGridCell> for SensorBundle {
     fn from(int_grid_cell: IntGridCell) -> SensorBundle {
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
