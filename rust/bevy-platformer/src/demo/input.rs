@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppSet;
 
-use super::{entities::Player, level::{Level, RespawnLevel, SpawnLevel, SpawnNextLevel}, movement::MovementController};
+use super::{entities::Player, level::{RespawnLevel, SpawnLevelOffset}, movement::MovementController};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
@@ -58,14 +58,14 @@ fn record_player_directional_input(
 }
 
 fn respawn_level(mut commands: Commands, input: Res<ButtonInput<KeyCode>>) {
-    if input.pressed(KeyCode::KeyR) {
+    if input.just_pressed(KeyCode::KeyR) {
         commands.queue(RespawnLevel);
     }
-    if input.pressed(KeyCode::KeyN) {
-       commands.queue(SpawnNextLevel);
+    if input.just_pressed(KeyCode::KeyN) {
+       commands.queue(SpawnLevelOffset { offset: 1 });
     }
-    if input.pressed(KeyCode::KeyP) {
-       commands.queue(SpawnNextLevel);
+    if input.just_pressed(KeyCode::KeyP) {
+       commands.queue(SpawnLevelOffset { offset: -1 });
     }
 
 }

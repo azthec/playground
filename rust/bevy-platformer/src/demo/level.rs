@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{
-    assets::{LdtkProject, LevelIndices},
+    assets::LdtkProject,
     LdtkPlugin, LdtkWorldBundle, LevelIid, LevelSelection, Respawn,
 };
 
@@ -55,15 +55,16 @@ impl Command for SpawnLevel {
 }
 
 #[derive(Debug)]
-// TODO rename
-pub struct SpawnNextLevel;
+pub struct SpawnLevelOffset {
+    pub offset: isize
+}
 
-impl Command for SpawnNextLevel {
+impl Command for SpawnLevelOffset {
     fn apply(self, world: &mut World) {
         let level = world.get_resource::<CurrentLevel>();
         if let Some(level) = level {
             let new_level = Level {
-                id: level.level.id + 1,
+                id: (level.level.id as isize + self.offset) as usize,
             };
             world.remove_resource::<CurrentLevel>();
             world.insert_resource(CurrentLevel { level: new_level });
