@@ -30,6 +30,10 @@ fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Title);
 }
 
+fn continue_to_gameplay_screen(mut next_screen: ResMut<NextState<Screen>>) {
+    next_screen.set(Screen::Gameplay);
+}
+
 fn all_assets_loaded(resource_handles: Res<ResourceHandles>) -> bool {
     resource_handles.is_all_done()
 }

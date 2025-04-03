@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::physics::{colliders::{ColliderBundle, SensorBundle}, ground::GroundDetection, spike::{Spike, Spikeable}};
+use crate::physics::{colliders::{ColliderBundle, SensorBundle}, goal::{Goal, GoalDetection}, ground::GroundDetection, spike::{Spike, Spikeable}};
 
 use super::{animation::PlayerAnimation, movement::MovementController};
 
@@ -27,10 +27,14 @@ struct PlayerBundle {
     ground_detection: GroundDetection,
     spike_detection: Spikeable,
     animation: PlayerAnimation,
+    goal_detection: GoalDetection
 }
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct GoalBundle {
+    goal: Goal,
+    #[from_entity_instance]
+    pub sensor_bundle: SensorBundle,
     #[sprite_sheet]
     sprite_sheet: Sprite,
 }

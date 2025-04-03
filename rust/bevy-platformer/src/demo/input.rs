@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppSet;
 
-use super::{entities::Player, level::RespawnLevel, movement::MovementController};
+use super::{entities::Player, level::{Level, RespawnLevel, SpawnLevel, SpawnNextLevel}, movement::MovementController};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
@@ -61,4 +61,11 @@ fn respawn_level(mut commands: Commands, input: Res<ButtonInput<KeyCode>>) {
     if input.pressed(KeyCode::KeyR) {
         commands.queue(RespawnLevel);
     }
+    if input.pressed(KeyCode::KeyN) {
+       commands.queue(SpawnNextLevel);
+    }
+    if input.pressed(KeyCode::KeyP) {
+       commands.queue(SpawnNextLevel);
+    }
+
 }

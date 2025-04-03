@@ -80,7 +80,7 @@ fn clamp_camera(
     mut camera_query: Query<(&OrthographicProjection, &mut Transform), (With<IsDefaultUiCamera>, Without<Player>)>,
     level_query: Query<&LevelIid, (Without<OrthographicProjection>, Without<Player>)>,
     ldtk_projects: Query<&LdtkProjectHandle>,
-    level_selection: Res<LevelSelection>,
+    _level_selection: Res<LevelSelection>,
     ldtk_project_assets: Res<Assets<LdtkProject>>,
 ) {
     let (projection, mut camera_transform) = camera_query.single_mut();
@@ -96,13 +96,12 @@ fn clamp_camera(
             .get_raw_level_by_iid(&level_iid.to_string())
             .expect("Spawned level should exist in LDtk project");
 
-        if level_selection.is_match(&LevelIndices::default(), level) {
-            let level_rect = Rect::new(0., 0., level.px_wid as f32, level.px_hei as f32);
-            let xy = camera_transform.translation.xy().clamp(
-                level_rect.min + camera_rect.half_size(),
-                level_rect.max - camera_rect.half_size(),
-            );
-            camera_transform.translation = xy.extend(camera_transform.translation.z);
-        }
+        if _level_selection.is_match(&LevelIndices::default(), level) {}
+        let level_rect = Rect::new(0., 0., level.px_wid as f32, level.px_hei as f32);
+        let xy = camera_transform.translation.xy().clamp(
+            level_rect.min + camera_rect.half_size(),
+            level_rect.max - camera_rect.half_size(),
+        );
+        camera_transform.translation = xy.extend(camera_transform.translation.z);
     }
 }

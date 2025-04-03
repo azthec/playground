@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{audio::{PlaybackMode, Volume}, prelude::*};
 use bevy_rapier2d::prelude::Velocity;
 use rand::prelude::*;
 use std::time::Duration;
@@ -93,7 +93,11 @@ fn trigger_step_sound_effect(
             let random_step = assets.audio_steps.choose(rng).unwrap();
             commands.spawn((
                 AudioPlayer(random_step.clone()),
-                PlaybackSettings::DESPAWN,
+                PlaybackSettings {
+                    mode: PlaybackMode::Despawn,
+                    volume: Volume::new(0.3),
+                    ..PlaybackSettings::ONCE
+                },
                 SoundEffect,
             ));
         }

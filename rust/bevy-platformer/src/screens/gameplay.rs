@@ -24,7 +24,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn_level(mut commands: Commands) {
-    commands.queue(SpawnLevel { level: Level { id: 0 } });
+    commands.queue(SpawnLevel { level: Level::ONE });
 }
 
 #[derive(Resource, Asset, Reflect, Clone)]

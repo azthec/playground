@@ -68,6 +68,12 @@ impl From<&EntityInstance> for SensorBundle {
                 rotation_constraints,
                 active_events: ActiveEvents::COLLISION_EVENTS,
             },
+            "Goal" => SensorBundle {
+                collider: Collider::cuboid(9., 9.),
+                sensor: Sensor,
+                rotation_constraints,
+                active_events: ActiveEvents::COLLISION_EVENTS,
+            },
             _ => SensorBundle::default(),
         }
     }

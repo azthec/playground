@@ -1,7 +1,10 @@
 //! Spawn the main level.
 
 use bevy::prelude::*;
-use bevy_ecs_ldtk::{assets::LdtkProject, LdtkPlugin, LdtkWorldBundle, LevelIid, LevelSelection, Respawn};
+use bevy_ecs_ldtk::{
+    assets::{LdtkProject, LevelIndices},
+    LdtkPlugin, LdtkWorldBundle, LevelIid, LevelSelection, Respawn,
+};
 
 use crate::{asset_tracking::LoadResource, screens::Screen};
 
@@ -11,10 +14,22 @@ pub(super) fn plugin(app: &mut App) {
     app.load_resource::<LevelAssets>();
 }
 
+// TODO rework
+#[derive(Resource)]
+pub struct CurrentLevel {
+    level: Level,
+}
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
 pub struct Level {
-    pub id: usize,
+    id: usize,
+}
+
+impl Level {
+    pub const ONE: Level = Level { id: 0 };
+    pub const TWO: Level = Level { id: 1 };
+    pub const THREE: Level = Level { id: 2 };
 }
 
 #[derive(Debug)]
@@ -33,7 +48,27 @@ impl Command for SpawnLevel {
                 },
                 StateScoped(Screen::Gameplay),
             ));
+            world.insert_resource(CurrentLevel { level: self.level });
             world.insert_resource(LevelSelection::index(self.level.id));
+        }
+    }
+}
+
+#[derive(Debug)]
+// TODO rename
+pub struct SpawnNextLevel;
+
+impl Command for SpawnNextLevel {
+    fn apply(self, world: &mut World) {
+        let level = world.get_resource::<CurrentLevel>();
+        if let Some(level) = level {
+            let new_level = Level {
+                id: level.level.id + 1,
+            };
+            world.remove_resource::<CurrentLevel>();
+            world.insert_resource(CurrentLevel { level: new_level });
+            world.remove_resource::<LevelSelection>();
+            world.insert_resource(LevelSelection::index(new_level.id));
         }
     }
 }
