@@ -42,8 +42,6 @@ struct GoalBundle {
 #[derive(Default, Bundle, LdtkEntity)]
 struct SpikeBundle {
     spike: Spike,
-    #[from_entity_instance]
-    pub sensor_bundle: SensorBundle,
     #[sprite_sheet]
     sprite_sheet: Sprite,
 }

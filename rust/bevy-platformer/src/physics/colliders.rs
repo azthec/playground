@@ -62,12 +62,6 @@ impl From<&EntityInstance> for SensorBundle {
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
         match entity_instance.identifier.as_ref() {
-            "Spike" => SensorBundle {
-                collider: Collider::capsule_x(5., 4.),
-                sensor: Sensor,
-                rotation_constraints,
-                active_events: ActiveEvents::COLLISION_EVENTS,
-            },
             "Goal" => SensorBundle {
                 collider: Collider::cuboid(9., 9.),
                 sensor: Sensor,
