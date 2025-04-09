@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::screens::Screen;
+use crate::{lighting::CameraLightingBundle, screens::Screen};
 
 use super::entities::Player;
 
@@ -40,6 +40,7 @@ fn spawn_camera(mut commands: Commands) {
             ..OrthographicProjection::default_2d()
         },
         GameCamera,
+        CameraLightingBundle::default()
     ));
 }
 

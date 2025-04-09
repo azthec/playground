@@ -22,10 +22,6 @@ impl From<&EntityInstance> for ColliderBundle {
             "Player" => ColliderBundle {
                 collider: Collider::ball(8.),
                 rigid_body: RigidBody::Dynamic,
-                friction: Friction {
-                    coefficient: 0.0,
-                    combine_rule: CoefficientCombineRule::Min,
-                },
                 rotation_constraints,
                 ..Default::default()
             },

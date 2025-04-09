@@ -336,6 +336,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_ecs_ldtk",
+ "bevy_lit",
  "bevy_rapier2d",
  "log",
  "rand",
@@ -862,6 +863,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_lit"
+version = "0.6.0"
+source = "git+https://github.com/azthec/bevy_lit?branch=main#3c4708fa7e81d59bb52720bbf1f10df409976a80"
+dependencies = [
+ "bevy",
+ "bevy_voronoi",
+]
+
+[[package]]
 name = "bevy_log"
 version = "0.15.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1306,6 +1316,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.100",
+]
+
+[[package]]
+name = "bevy_voronoi"
+version = "0.2.0"
+source = "git+https://github.com/azthec/bevy_voronoi?branch=main#1a2b7cc8b61953b7dcaf10e6b73dfc804787a16a"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]

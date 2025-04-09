@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::color::palettes::basic;
 use bevy::prelude::*;
 
@@ -7,21 +9,7 @@ use bevy_rapier2d::prelude::*;
 use crate::game::camera::GameCamera;
 use crate::AppSet;
 
-// fn raycast(mut commands: Commands, rapier_context: ReadRapierContext) {
-//     let ray_pos = Vec2::new(1.0, 2.0);
-//     let ray_dir = Vec2::new(0.0, 1.0);
-//     let max_toi = 4.0;
-//     let solid = true;
-//     let filter = QueryFilter::default();
-//
-//     let context = rapier_context.single();
-//     if let Some((entity, toi)) = context.cast_ray(ray_pos, ray_dir, max_toi, solid, filter) {
-//         // The first collider hit has the entity `entity` and it hit after
-//         // the ray travelled a distance equal to `ray_dir * toi`.
-//         let hit_point = ray_pos + ray_dir * toi;
-//         println!("Entity {:?} hit at point {}", entity, hit_point);
-//     }
-// }
+const MAX_DISTANCE: f32 = 50.;
 
 #[derive(Default, Component)]
 pub struct VisibilityRaySource;
@@ -40,7 +28,9 @@ pub fn raycast(
     };
 
     for (camera, camera_transform) in &cameras {
-        let (entity, ray_source) = visibility_ray_source.single();
+        let Ok((entity, ray_source)) = visibility_ray_source.get_single() else {
+            return;
+        };
         let Ok(ray_target) = camera.viewport_to_world(camera_transform, cursor_position) else {
             return;
         };
@@ -53,8 +43,8 @@ pub fn raycast(
         let context = rapier_context.single();
         let hit = context.cast_ray(
             player,
-            mouse,
-            f32::MAX,
+            (mouse - player).normalize(),
+            MAX_DISTANCE,
             true,
             QueryFilter::default().exclude_collider(entity),
         );
@@ -63,6 +53,61 @@ pub fn raycast(
         if let Some((entity, _toi)) = hit {
             let color = basic::BLUE.into();
             commands.entity(entity).insert(ColliderDebugColor(color));
+        }
+    }
+}
+
+#[derive(Default, Component)]
+pub struct FovCone;
+
+pub fn setup_cone(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    commands.spawn((
+        Mesh2d(meshes.add(Cone::new(5., 40.))),
+        MeshMaterial2d(materials.add(Color::hsl(360. * 10 as f32 / 10 as f32, 0.95, 0.7))),
+        FovCone,
+    ));
+}
+pub fn update_cone(
+    windows: Query<&Window, With<PrimaryWindow>>,
+    cameras: Query<(&Camera, &GlobalTransform), With<GameCamera>>,
+    player_query: Query<&Transform, (With<VisibilityRaySource>, Without<FovCone>)>,
+    mut cone_query: Query<&mut Transform, (With<FovCone>, Without<VisibilityRaySource>)>,
+) {
+    let window = windows.single();
+
+    let Some(cursor_position) = window.cursor_position() else {
+        return;
+    };
+
+    for (camera, camera_transform) in &cameras {
+        let Ok(mouse) = camera.viewport_to_world(camera_transform, cursor_position) else {
+            return;
+        };
+        let Ok(player_transform) = player_query.get_single() else {
+            return;
+        };
+
+        let mouse_world_pos = mouse.origin.xy();
+        let player_pos = player_transform.translation.xy();
+
+        // Calculate the direction from the player to the mouse
+        let direction = (mouse_world_pos - player_pos).normalize();
+
+        for mut cone_transform in &mut cone_query {
+            // Center the cone on the player offset by the direction
+            cone_transform.translation.x = player_pos.x + direction.x * 22.5;
+            cone_transform.translation.y = player_pos.y + direction.y * 22.5;
+            cone_transform.translation.z = 1.;
+
+            // Compute rotation in radians
+            let angle = direction.y.atan2(direction.x) + PI / 2.;
+
+            // Apply rotation
+            cone_transform.rotation = Quat::from_rotation_z(angle);
         }
     }
 }
@@ -114,5 +159,7 @@ impl Plugin for VisibilityPlugin {
         app.add_systems(Update, raycast);
         app.add_systems(Startup, debug_setup);
         app.add_systems(FixedUpdate, debug_handler.in_set(AppSet::TickTimers));
+        app.add_systems(Startup, setup_cone);
+        app.add_systems(Update, update_cone);
     }
 }

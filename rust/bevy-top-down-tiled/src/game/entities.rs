@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::physics::{colliders::ColliderBundle, spike::{Spike, Spikeable}, visibility::VisibilityRaySource};
+use crate::{lighting::PointLight2dBundle, physics::{colliders::ColliderBundle, spike::{Spike, Spikeable}, visibility::VisibilityRaySource}};
 
 use super::movement::MovementController;
 
@@ -22,7 +22,8 @@ struct PlayerBundle {
     pub collider_bundle: ColliderBundle,
     controller: MovementController,
     spike_detection: Spikeable,
-    ray_source: VisibilityRaySource
+    ray_source: VisibilityRaySource,
+    light_source: PointLight2dBundle
 }
 
 #[derive(Default, Bundle, LdtkEntity)]

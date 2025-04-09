@@ -7,12 +7,16 @@ use bevy_ecs_ldtk::prelude::*;
 
 use bevy_rapier2d::prelude::*;
 
+use crate::lighting::LightOccluder2dBundle;
+
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Wall;
 
 #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
 pub struct WallBundle {
     wall: Wall,
+    // TODO: move somewhere else? maybe entities?
+    occluder: LightOccluder2dBundle
 }
 
 /// Spawns heron collisions for the walls of a level

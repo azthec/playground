@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{math::VectorSpace, prelude::*};
 use bevy_rapier2d::prelude::Velocity;
 
 use crate::AppSet;
@@ -21,7 +21,7 @@ impl Default for MovementController {
     fn default() -> Self {
         Self {
             intents: Vec::new(),
-            max_speed: 200.,
+            max_speed: 100.,
         }
     }
 }
@@ -29,7 +29,7 @@ fn apply_movement_player(
     mut query: Query<(&MovementController, &mut Velocity), With<Player>>,
 ) {
     for (controller, mut velocity) in &mut query {
-        velocity.linvel.x = 0.;
+        velocity.linvel = Vec2::ZERO;
         for intent in controller.intents.iter() {
             match intent {
                 PlayerInput::Up => {
