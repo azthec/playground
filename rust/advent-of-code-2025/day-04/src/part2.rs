@@ -1,5 +1,7 @@
 use std::iter::successors;
 
+use rayon::prelude::*;
+
 use nom::{
   IResult, Parser,
   branch::alt,
@@ -29,7 +31,7 @@ pub fn process(_input: &str) -> miette::Result<usize> {
 
 fn remove_accessible(grid: &Vec<Vec<bool>>) -> (Vec<Vec<bool>>, usize) {
   let (new_grid, removed): (Vec<Vec<bool>>, Vec<usize>) = grid
-    .iter()
+    .par_iter() // easy parallelism optimisation, works fine with iter
     .enumerate()
     .map(|(i, row)| {
       let (new_row, new_removed): (Vec<bool>, Vec<usize>) = row
