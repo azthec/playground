@@ -5,6 +5,7 @@ members = [
     "day-02",
     "day-03",
     "day-04",
+    "day-05",
 ]
 default-members = ["day-*"]
 resolver = "3"
@@ -13,11 +14,11 @@ resolver = "3"
 divan = "0.1.7"
 itertools = "0.14.0"
 nom = "8.0.0"
+rayon = "1.11.0"
 rstest = "0.26"
 thiserror = "2.0.3"
 tracing = "0.1.41"
 tracing-subscriber = "0.3.18"
-rayon = "1.11.0"
 
 [workspace.dependencies.miette]
 version = "7.4"
