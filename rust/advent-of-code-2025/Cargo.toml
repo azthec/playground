@@ -8,6 +8,7 @@ members = [
     "day-05",
     "day-06",
     "day-07",
+    "day-08",
 ]
 default-members = ["day-*"]
 resolver = "3"
@@ -21,6 +22,7 @@ rstest = "0.26"
 thiserror = "2.0.3"
 tracing = "0.1.41"
 tracing-subscriber = "0.3.18"
+glam = "0.30.9"
 
 [workspace.dependencies.miette]
 version = "7.4"
